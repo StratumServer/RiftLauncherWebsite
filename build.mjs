@@ -53,6 +53,23 @@ const scenes = checkout("backgrounds", process.env.RIFT_BACKGROUNDS)
 
 const read = (...parts) => readFileSync(join(...parts), "utf8")
 
+// ---------------------------------------------------------------- locales
+
+/**
+ * Every string the landing page shows lives in locales/<code>.json, one file per language. The first
+ * one in this list is the default and is served from the root; the rest get a folder of their own.
+ * Only the landing is translated: the documentation, the privacy policy and the release notes are
+ * English wherever you read them, which the localized pages say out loud rather than hiding.
+ */
+const LOCALES = ["en", "fr"].map((code) => ({ code, ...JSON.parse(read(ROOT, "locales", `${code}.json`)) }))
+const [EN] = LOCALES
+
+/** Where a locale's landing page lands in the output. */
+const landingOut = (locale) => (locale === EN ? "index.html" : `${locale.code}/index.html`)
+
+/** Fills `{name}` holes in a locale string, which is what a translated sentence with numbers in it needs. */
+const fill = (template, values) => template.replace(/\{(\w+)\}/g, (_, key) => values[key])
+
 // ---------------------------------------------------------------- navigation
 
 /**
@@ -257,6 +274,7 @@ const ICON = {
   privacy: line('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'),
   moddb: line('<path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 12l9-5"/><path d="M12 12v10"/><path d="M12 12L3 7"/>'),
   scene: line('<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 15l-5-4-4 3-3-2-6 5"/>'),
+  globe: line('<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.4 3.9 5.6 3.9 9s-1.4 6.6-3.9 9c-2.5-2.4-3.9-5.6-3.9-9s1.4-6.6 3.9-9z"/>'),
   versions: line('<rect x="3" y="8" width="13" height="13" rx="2"/><path d="M8 8V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3"/>'),
   installations: line('<rect x="2" y="5" width="9" height="15" rx="2"/><rect x="13" y="5" width="9" height="15" rx="2"/><path d="M4.5 9.5h4"/><path d="M15.5 9.5h4"/>'),
   backup: line('<path d="M3.5 12a8.5 8.5 0 1 0 2.9-6.4L3 8"/><path d="M3 3.5V8h4.5"/><path d="M12 8v4.3l3 1.7"/>'),
@@ -270,16 +288,44 @@ const ICON = {
 /** An icon and its word, the word carrying the underline. */
 const iconLink = (href, icon, label) => `<a href="${escape(href)}">${icon}<span>${escape(label)}</span></a>`
 
-function footer(out) {
+function footer(out, t) {
+  const link = (href, text) => `<a href="${href}">${text}</a>`
   return `<footer class="panel footer">
-<nav class="icon-row" aria-label="Site">${iconLink(REPO, ICON.github, "GitHub")}${iconLink(DISCORD, ICON.discord, "Discord")}${iconLink(MODDB, ICON.moddb, "ModDB")}${iconLink(linkTo(out, "privacy.html"), ICON.privacy, "Privacy Policy")}</nav>
-<p>RiftLauncher is unofficial and not affiliated with Anego Studios, the developers of <a href="https://www.vintagestory.at">Vintage Story</a>.</p>
-<p>RiftLauncher is a fork of <a href="https://github.com/XurxoMF/vs-launcher">VS Launcher</a> by <a href="https://github.com/XurxoMF">XurxoMF</a>. Everything the launcher does today started there.</p>
+<nav class="icon-row" aria-label="Site">${iconLink(REPO, ICON.github, "GitHub")}${iconLink(DISCORD, ICON.discord, "Discord")}${iconLink(MODDB, ICON.moddb, "ModDB")}${iconLink(linkTo(out, "privacy.html"), ICON.privacy, t.privacy)}</nav>
+<p>${fill(escape(t.unofficial), { vintageStory: link("https://www.vintagestory.at", "Vintage Story") })}</p>
+<p>${fill(escape(t.fork), { vsLauncher: link("https://github.com/XurxoMF/vs-launcher", "VS Launcher"), author: link("https://github.com/XurxoMF", "XurxoMF") })}</p>
 </footer>`
 }
 
-function shell({ out, title, description, body, wide }) {
-  const home = linkTo(out, "index.html")
+/*
+ * The language control, top right of the bar beside the scene picker and built the same way: a
+ * details/summary disclosure, the button showing a globe and the code of the language you are
+ * reading, the panel listing every language by its own name in its own language. This is
+ * navigation, so it is a plain list of links inside a native disclosure and needs no script at all;
+ * the Escape key at the bottom of the page is a convenience on top, not what makes it work.
+ *
+ * It grows on its own as locales are added, and disappears entirely when there is only one.
+ */
+function languages(out, t) {
+  if (LOCALES.length < 2) return ""
+  const item = (locale) =>
+    locale === t
+      ? `<span aria-current="true" lang="${locale.code}">${escape(locale.name)}</span>`
+      : `<a href="${escape(linkTo(out, landingOut(locale)))}" hreflang="${locale.code}" lang="${locale.code}">${escape(locale.name)}</a>`
+  return `<details class="picker lang" id="lang">
+<summary aria-label="${escape(t.changeLanguage)}" title="${escape(t.changeLanguage)}">${ICON.globe}<span>${escape(t.short)}</span></summary>
+<nav class="picker-panel" aria-label="${escape(t.changeLanguage)}">${LOCALES.map(item).join("")}</nav>
+</details>`
+}
+
+/** Tells search engines which page is which language, and which one to serve when it cannot tell. */
+const alternates = (out) =>
+  [...LOCALES.map((locale) => [locale.code, landingOut(locale)]), ["x-default", "index.html"]]
+    .map(([code, target]) => `<link rel="alternate" hreflang="${code}" href="${escape(linkTo(out, target))}">`)
+    .join("\n")
+
+function shell({ out, title, description, body, wide, t = EN, localized = false }) {
+  const home = linkTo(out, localized ? landingOut(t) : "index.html")
   const docs = linkTo(out, "docs/index.html")
   const asset = (name) => escape(linkTo(out, name))
   const sceneUrls = catalog.map((scene) => linkTo(out, `backgrounds/${scene.file}`))
@@ -289,8 +335,8 @@ function shell({ out, title, description, body, wide }) {
    * bottom reveals it, so with scripting off there is no control that cannot do anything.
    */
   const picker = `<details class="picker" id="picker" hidden>
-<summary aria-label="${escape(TEXT.scene)}" title="${escape(TEXT.scene)}">${ICON.scene}<span class="picker-name">${escape(catalog[0].name)}</span></summary>
-<div class="picker-panel" role="group" aria-label="${escape(TEXT.scene)}">${catalog
+<summary aria-label="${escape(t.scene)}" title="${escape(t.scene)}">${ICON.scene}<span class="picker-name">${escape(catalog[0].name)}</span></summary>
+<div class="picker-panel" role="group" aria-label="${escape(t.scene)}">${catalog
     .map(
       (scene, i) =>
         `<button class="tile" type="button" aria-pressed="${i === 0}"><img src="${escape(linkTo(out, `backgrounds/${scene.thumbnail}`))}" alt="" width="320" height="180" loading="lazy"><span>${escape(scene.name)}</span></button>`
@@ -298,7 +344,7 @@ function shell({ out, title, description, body, wide }) {
     .join("")}</div>
 </details>`
   return `<!doctype html>
-<html lang="en">
+<html lang="${t.code}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -309,7 +355,8 @@ function shell({ out, title, description, body, wide }) {
 <meta property="og:title" content="${escape(title)}">
 <meta property="og:description" content="${escape(description)}">
 <meta property="og:image" content="${SITE_URL}branding/riftlauncher-full.png">
-<meta property="og:url" content="${SITE_URL}${out === "index.html" ? "" : out}">
+<meta property="og:url" content="${SITE_URL}${out.replace(/(^|\/)index\.html$/, "$1")}">
+<meta property="og:locale" content="${t.code}">${localized ? `\n${alternates(out)}` : ""}
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="${asset("icon.png")}">
 <link rel="stylesheet" href="${asset("site.css")}">
@@ -318,18 +365,19 @@ function shell({ out, title, description, body, wide }) {
 <body>
 <div class="scene" id="scene"></div>
 <div class="scrim"></div>
-<a class="skip" href="#main">Skip to content</a>
+<a class="skip" href="#main">${escape(t.skip)}</a>
 <header class="topbar">
 <a class="brand" href="${escape(home)}"><img src="${asset("branding/riftlauncher-full.png")}" alt="" width="1254" height="1254">RiftLauncher</a>
 <div class="topbar-end">
-<nav class="icon-only" aria-label="Main"><a href="${escape(docs)}" aria-label="${escape(TEXT.docsLink)}" title="${escape(TEXT.docsLink)}">${ICON.docs}</a><a href="${RELEASES}/latest" aria-label="${escape(TEXT.download)}" title="${escape(TEXT.download)}">${ICON.download}</a><a href="${REPO}" aria-label="GitHub" title="GitHub">${ICON.github}</a></nav>
+<nav class="icon-only" aria-label="Main"><a href="${escape(docs)}" aria-label="${escape(t.docsLink)}" title="${escape(t.docsLink)}">${ICON.docs}</a><a href="${RELEASES}/latest" aria-label="${escape(t.download)}" title="${escape(t.download)}">${ICON.download}</a><a href="${REPO}" aria-label="GitHub" title="GitHub">${ICON.github}</a></nav>
+${localized ? languages(out, t) : ""}
 ${picker}
 </div>
 </header>
 <div class="layout${wide ? " layout-wide" : ""}">
 ${body}
 </div>
-${footer(out)}
+${footer(out, t)}
 <script>
 // One scene per visit, chosen from the launcher's own catalog. The stylesheet already names a
 // default, so a reader with scripting off still gets a background rather than a blank page.
@@ -360,80 +408,31 @@ ${footer(out)}
       // rather than on the click, and the swap looks instant.
       tile.addEventListener("pointerenter", function () { new Image().src = s[index] })
     })(i, tiles[i])
+  var pops = [picker, document.getElementById("lang")].filter(Boolean)
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && picker.open) {
-      picker.open = false
-      summary.focus()
-    }
+    if (e.key !== "Escape") return
+    pops.forEach(function (p) {
+      if (!p.open) return
+      p.open = false
+      p.querySelector("summary").focus()
+    })
   })
   document.addEventListener("click", function (e) {
-    if (picker.open && !picker.contains(e.target)) picker.open = false
+    pops.forEach(function (p) {
+      if (p.open && !p.contains(e.target)) p.open = false
+    })
   })
 
   var download = document.getElementById("download")
   if (download) {
-    var platform = /Windows|Win64|Win32/.test(navigator.userAgent) ? ${JSON.stringify(TEXT.windows)} : /Linux|X11/.test(navigator.userAgent) ? ${JSON.stringify(TEXT.linux)} : null
-    if (platform) download.textContent = ${JSON.stringify(TEXT.downloadFor)} + platform
+    var platform = /Windows|Win64|Win32/.test(navigator.userAgent) ? ${JSON.stringify(t.windows)} : /Linux|X11/.test(navigator.userAgent) ? ${JSON.stringify(t.linux)} : null
+    if (platform) download.textContent = ${JSON.stringify(t.downloadFor)} + platform
   }
 })()
 </script>
 </body>
 </html>
 `
-}
-
-// ---------------------------------------------------------------- landing
-
-/** Every string this build writes into a page, in one place, so a second locale is a second object. */
-const TEXT = {
-  title: "RiftLauncher",
-  docsLink: "Docs",
-  scene: "Background",
-  description:
-    "RiftLauncher is an independent launcher for Vintage Story. Install multiple versions, keep separate installations with their own mods, worlds and configs, and make backups.",
-  kicker: "A launcher for Vintage Story",
-  headline: "Every version of Vintage Story, side by side.",
-  lead: "Keep as many installations as you like, each with its own mods, worlds and configs, make manual and automatic backups before anything breaks, and browse the ModDB without leaving the launcher.",
-  download: "Download",
-  downloadFor: "Download for ",
-  windows: "Windows",
-  linux: "Linux",
-  docs: "Browse the documentation",
-  seeFeatures: "See what it does",
-  beta: "Beta prerelease, so expect rough edges. Back up your worlds first.",
-  features: "What it does",
-  cards: [
-    ["versions", "Versions side by side", "Install as many game versions as you like, and choose which one each installation runs."],
-    [
-      "installations",
-      "Installations that stay separate",
-      "Every installation keeps its own mods, worlds and configs, so what you do in one leaves the others alone."
-    ],
-    ["backup", "Backups", "Make a backup by hand whenever you want, or have the launcher take one automatically before you play."],
-    [
-      "moddb",
-      "Mods without leaving the launcher",
-      "Browse the ModDB, install and update, search what is already installed, and hold a mod back so Update all skips it."
-    ],
-    ["accounts", "Your accounts", "Keep several Vintage Story accounts saved and switch between them. In the next release."],
-    ["scene", "Make it yours", "Set the launcher's background from the catalog of scenes, or from an image of your own."]
-  ],
-  releases: "Releases",
-  prerelease: "beta",
-  allReleases: "All releases on GitHub",
-  downloads: "Downloads per release",
-  downloadsNote:
-    "Counted from the installers on each GitHub release when this page was built. Fresh downloads and automatic updates both count, so a bar reads as how many installs moved onto that version, not as new players.",
-  downloadsLabel: (rows) => `Downloads per release. ${rows.map((row) => `${row.tag}, ${row.count}`).join(". ")}.`,
-  overTime: "Downloads over time",
-  overTimeNote: (first, last) => `${first.total} on ${first.date} to ${last.total} on ${last.date}, counted once a day.`,
-  platforms: [
-    ["Windows", "riftlauncher-X.X.X-setup.exe"],
-    ["Linux AppImage", "riftlauncher-X.X.X.AppImage"],
-    ["Debian and Ubuntu", ".deb"],
-    ["Fedora and RHEL", ".rpm"],
-    ["Arch", ".pacman"]
-  ]
 }
 
 // ---------------------------------------------------------------- releases
@@ -478,7 +477,7 @@ const feedChecks = (release) => ({
   linux: release.assets.find((a) => a.name === "latest-linux.yml")?.download_count ?? 0
 })
 
-const day = (iso) => new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })
+const day = (iso, t) => new Date(iso).toLocaleDateString(t.dateLocale, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })
 
 /**
  * Release notes as GitHub holds them, in the house style they were written in. Headings drop two
@@ -500,7 +499,7 @@ function notes(markdown) {
  * bars are widths in percent and everything else is a fixed number of pixels, so the chart fills the
  * panel at any width while the labels stay the size they were authored at, phone included.
  */
-function barChart(rows) {
+function barChart(rows, t) {
   const ROW = 46
   const most = Math.max(...rows.map((row) => row.count), 1)
   const body = rows
@@ -515,7 +514,7 @@ function barChart(rows) {
       return `<text class="bar-tag" x="0" y="${y + 13}">${escape(row.tag)}</text><rect class="bar-track" x="0" y="${y + 21}" width="100%" height="18" rx="9"/><rect class="bar-fill" x="0" y="${y + 21}" width="${width}%" height="18" rx="9"/>${number}`
     })
     .join("")
-  return `<svg class="chart" width="100%" height="${rows.length * ROW}" role="img" aria-label="${escape(TEXT.downloadsLabel(rows))}">${body}</svg>`
+  return `<svg class="chart" width="100%" height="${rows.length * ROW}" role="img" aria-label="${escape(fill(t.downloadsLabel, { rows: rows.map((row) => `${row.tag}, ${row.count}`).join(". ") }))}">${body}</svg>`
 }
 
 /*
@@ -541,8 +540,11 @@ function history() {
   return points
 }
 
+/** Read once, since every locale's landing draws the same curve. */
+const points = history()
+
 /** The curve, or nothing at all until there are two points at least a week apart. */
-function lineChart(points) {
+function lineChart(points, t) {
   const span = (Date.parse(points[points.length - 1]?.date) - Date.parse(points[0]?.date)) / 86400000
   if (points.length < 2 || !(span >= 7)) return ""
   const totals = points.map((point) => point.total)
@@ -551,66 +553,76 @@ function lineChart(points) {
   const line = points
     .map((point, i) => `${(i / (points.length - 1)) * 100},${40 - ((point.total - low) / Math.max(high - low, 1)) * 36 - 2}`)
     .join(" ")
-  const ends = [points[0], points[points.length - 1]].map((point) => ({ total: point.total, date: day(point.date) }))
-  return `<h3>${escape(TEXT.overTime)}</h3>
+  const [first, last] = [points[0], points[points.length - 1]]
+  const note = fill(t.overTimeNote, {
+    firstTotal: first.total,
+    firstDate: day(first.date, t),
+    lastTotal: last.total,
+    lastDate: day(last.date, t)
+  })
+  return `<h3>${escape(t.overTime)}</h3>
 <svg class="curve" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><polyline points="${line}" fill="none" vector-effect="non-scaling-stroke"/></svg>
-<p class="chart-note">${escape(TEXT.overTimeNote(...ends))}</p>`
+<p class="chart-note">${escape(note)}</p>`
 }
 
-function releasesSection() {
+function releasesSection(t) {
   if (!releases) return ""
-  const chip = `<span class="chip">${escape(TEXT.prerelease)}</span>`
+  const chip = `<span class="chip">${escape(t.prerelease)}</span>`
   const head = (release) => `<span class="release-tag">${escape(release.tag_name)}</span>${release.prerelease ? ` ${chip}` : ""}`
   const [latest, ...rest] = releases.slice(0, 3)
   const older = rest
     .map(
       (release) =>
-        `<details class="release prose"><summary>${head(release)} <span class="release-date">${escape(day(release.published_at))}</span></summary>${notes(release.body)}</details>`
+        `<details class="release prose"><summary>${head(release)} <span class="release-date">${escape(day(release.published_at, t))}</span></summary>${notes(release.body)}</details>`
     )
     .join("")
   const rows = releases.map((release) => ({ tag: release.tag_name, count: totalOf(release) }))
   return `<section id="releases" class="panel section" aria-labelledby="releases-heading">
-<h2 id="releases-heading">${escape(TEXT.releases)}</h2>
+<h2 id="releases-heading">${escape(t.releases)}</h2>
 <article class="release release-latest prose">
-<h3>${head(latest)} <span class="release-date">${escape(day(latest.published_at))}</span></h3>
+<h3>${head(latest)} <span class="release-date">${escape(day(latest.published_at, t))}</span></h3>
 ${notes(latest.body)}
 </article>
 ${older}
 <div class="release chart-block prose">
-${lineChart(history())}
-<h3>${escape(TEXT.downloads)}</h3>
-${barChart(rows)}
-<p class="chart-note">${escape(TEXT.downloadsNote)}</p>
+${lineChart(points, t)}
+<h3>${escape(t.downloads)}</h3>
+${barChart(rows, t)}
+<p class="chart-note">${escape(t.downloadsNote)}</p>
 </div>
-<p class="more"><a href="${RELEASES}">${escape(TEXT.allReleases)}</a></p>
+<p class="more"><a href="${RELEASES}">${escape(t.allReleases)}</a></p>
 </section>`
 }
 
 // ---------------------------------------------------------------- landing
 
-function landing() {
-  const out = "index.html"
+/**
+ * One landing per locale. Every path here is worked out from the page's own depth, so the French
+ * page at fr/index.html reaches the same assets one level up without a base path anywhere.
+ */
+function landing(t) {
+  const out = landingOut(t)
   const body = `<main id="main" class="landing">
 <section class="hero panel">
 <div class="hero-column">
-<img class="hero-emblem" src="branding/riftlauncher-full.png" alt="" width="1254" height="1254">
-<p class="kicker">${escape(TEXT.kicker)}</p>
-<h1>${escape(TEXT.headline)}</h1>
-<p class="lead">${escape(TEXT.lead)}</p>
-<p class="cta"><a class="button" id="download" href="${RELEASES}/latest">${escape(TEXT.download)}</a> <a class="quiet" href="#features">${escape(TEXT.seeFeatures)}</a> <a class="quiet" href="docs/">${escape(TEXT.docs)}</a></p>
-<p class="ribbon">${escape(TEXT.beta)}</p>
-<ul class="platforms">${TEXT.platforms.map(([name, file]) => `<li><a href="${RELEASES}/latest">${escape(name)}</a> <span>${escape(file)}</span></li>`).join("")}</ul>
+<img class="hero-emblem" src="${escape(linkTo(out, "branding/riftlauncher-full.png"))}" alt="" width="1254" height="1254">
+<p class="kicker">${escape(t.kicker)}</p>
+<h1>${escape(t.headline)}</h1>
+<p class="lead">${escape(t.lead)}</p>
+<p class="cta"><a class="button" id="download" href="${RELEASES}/latest">${escape(t.download)}</a> <a class="quiet" href="#features">${escape(t.seeFeatures)}</a> <a class="quiet" href="${escape(linkTo(out, "docs/index.html"))}">${escape(t.docs)}</a></p>
+${t.docsNote ? `<p class="docs-note">${escape(t.docsNote)}</p>\n` : ""}<p class="ribbon">${escape(t.beta)}</p>
+<ul class="platforms">${t.platforms.map(([name, file]) => `<li><a href="${RELEASES}/latest">${escape(name)}</a> <span>${escape(file)}</span></li>`).join("")}</ul>
 </div>
 </section>
 <section id="features" class="panel section" aria-labelledby="features-heading">
-<h2 id="features-heading">${escape(TEXT.features)}</h2>
-<ul class="cards">${TEXT.cards
+<h2 id="features-heading">${escape(t.features)}</h2>
+<ul class="cards">${t.cards
     .map(([icon, title, text]) => `<li class="feature">${ICON[icon]}<h3>${escape(title)}</h3><p>${escape(text)}</p></li>`)
     .join("")}</ul>
 </section>
-${releasesSection()}
+${releasesSection(t)}
 </main>`
-  return shell({ out, title: TEXT.title, description: TEXT.description, body, wide: true })
+  return shell({ out, title: t.title, description: t.description, body, wide: true, t, localized: true })
 }
 
 // ---------------------------------------------------------------- build
@@ -632,8 +644,10 @@ for (const page of pages.values()) {
   write(page.out, shell({ out: page.out, title: `${title} | RiftLauncher`, description, body }))
 }
 
-write("index.html", landing())
-anchorsByPage.set("index.html", new Set(["main", "features", ...(releases ? ["releases"] : [])]))
+for (const locale of LOCALES) {
+  write(landingOut(locale), landing(locale))
+  anchorsByPage.set(landingOut(locale), new Set(["main", "features", ...(releases ? ["releases"] : [])]))
+}
 
 cpSync(join(ROOT, "assets"), OUT, { recursive: true })
 cpSync(join(source, "docs", ".gitbook", "assets"), join(OUT, "docs", ".gitbook", "assets"), { recursive: true })

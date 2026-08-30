@@ -341,15 +341,18 @@ a:hover {
 
 /* ------------------------------------------------------------------ prose */
 
+/*
+ * Prose spans its column. Nothing here caps a line length: the panel beside the sidebar is the
+ * width, and headings, tables, callouts and rules all run to its edge. Images are held to the
+ * column so they scale into it instead of over it, and a code block or a wide table scrolls inside
+ * its own box rather than pushing the page sideways.
+ */
 .prose {
   padding: clamp(1.25rem, 4vw, 2.5rem);
   min-width: 0;
   overflow-wrap: break-word;
 }
 
-.prose > * {
-  max-width: 72ch;
-}
 
 .prose h1 {
   margin: 0 0 1.25rem;
@@ -388,7 +391,6 @@ a:hover {
 }
 
 .prose hr {
-  max-width: 72ch;
   border: 0;
   border-top: 1px solid var(--hairline);
   margin: 2rem 0;
@@ -410,7 +412,6 @@ a:hover {
 
 .prose figure {
   margin: 1.5rem 0;
-  max-width: 72ch;
 }
 
 .prose figcaption {
@@ -446,7 +447,6 @@ code {
 }
 
 .table-scroll {
-  max-width: 72ch;
   overflow-x: auto;
   margin: 0 0 1rem;
   border: 1px solid var(--hairline);
@@ -478,7 +478,6 @@ code {
 /* ---------------------------------------------------- callouts and blocks */
 
 .callout {
-  max-width: 72ch;
   margin: 1.25rem 0;
   padding: 0.9rem 1.1rem;
   border-radius: 8px;
@@ -508,7 +507,6 @@ code {
 }
 
 .card {
-  max-width: 72ch;
   margin: 0.75rem 0;
   padding: 0.7rem 1rem;
   border: 1px solid var(--hairline);
@@ -522,7 +520,6 @@ code {
 
 .stepper {
   counter-reset: step;
-  max-width: 72ch;
   margin: 1.25rem 0;
 }
 
@@ -613,6 +610,13 @@ code {
 
 .quiet {
   font-weight: 600;
+}
+
+/* On a translated page, the line under the buttons that says the documentation stayed English. */
+.docs-note {
+  margin: -0.5rem 0 1.25rem;
+  color: var(--muted);
+  font-size: 0.85rem;
 }
 
 /* The beta caveat, one line next to the button rather than a paragraph of its own. */
@@ -737,12 +741,6 @@ code {
   color: var(--text);
 }
 
-/* A release note takes the prose treatment for type, but spans its card: the landing's cards
-   set their own width, so the docs' reading measure does not apply here. */
-.release.prose > *,
-.release .prose > * {
-  max-width: none;
-}
 
 .release {
   margin: 0 0 1rem;
@@ -825,7 +823,6 @@ details.release[open] > summary {
  * chart fills the panel at any width and the labels never scale down to unreadable on a phone.
  */
 .chart-block > svg {
-  max-width: none;
   display: block;
   margin: 0 0 0.75rem;
 }
@@ -864,7 +861,6 @@ details.release[open] > summary {
 .curve {
   display: block;
   width: 100%;
-  max-width: none;
   height: 5rem;
   margin: 0 0 0.5rem;
 }
@@ -976,6 +972,41 @@ details.release[open] > summary {
 .tile[aria-pressed="true"] {
   border-color: var(--vsl);
   color: var(--text);
+}
+
+/*
+ * The language dropdown is the scene picker's sibling: the same button and the same panel, holding a
+ * list of links rather than a grid of thumbnails. It is navigation, so nothing about it is scripted;
+ * the disclosure opens on its own and every language is an ordinary underlined link. The language
+ * you are reading is not a link at all, which is what aria-current says and the fill repeats.
+ */
+.lang > .picker-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.15rem;
+  width: max-content;
+  min-width: 9rem;
+  max-width: 88vw;
+  padding: 0.4rem;
+}
+
+.lang .picker-panel > * {
+  padding: 0.4rem 0.55rem;
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.lang [aria-current] {
+  background: rgba(126, 80, 30, 0.45);
+  color: var(--text);
+  font-weight: 700;
+}
+
+.lang a:hover,
+.lang a:focus-visible {
+  color: var(--vsl);
+  background: rgba(9, 9, 11, 0.6);
 }
 
 /* ----------------------------------------------------------------- footer */

@@ -1,0 +1,65 @@
+{
+  "name": "English",
+  "short": "EN",
+  "dateLocale": "en-GB",
+
+  "title": "RiftLauncher",
+  "description": "RiftLauncher is an independent launcher for Vintage Story. Install multiple versions, keep separate installations with their own mods, worlds and configs, and make backups.",
+
+  "skip": "Skip to content",
+  "docsLink": "Docs",
+  "scene": "Background",
+  "changeLanguage": "Change language",
+
+  "kicker": "A launcher for Vintage Story",
+  "headline": "Every version of Vintage Story, side by side.",
+  "lead": "Keep as many installations as you like, each with its own mods, worlds and configs, make manual and automatic backups before anything breaks, and browse the ModDB without leaving the launcher.",
+
+  "download": "Download",
+  "downloadFor": "Download for ",
+  "windows": "Windows",
+  "linux": "Linux",
+  "docs": "Browse the documentation",
+  "seeFeatures": "See what it does",
+  "docsNote": "",
+  "beta": "Beta prerelease, so expect rough edges. Back up your worlds first.",
+
+  "platforms": [
+    ["Windows", "riftlauncher-X.X.X-setup.exe"],
+    ["Linux AppImage", "riftlauncher-X.X.X.AppImage"],
+    ["Debian and Ubuntu", ".deb"],
+    ["Fedora and RHEL", ".rpm"],
+    ["Arch", ".pacman"]
+  ],
+
+  "features": "What it does",
+  "cards": [
+    ["versions", "Versions side by side", "Install as many game versions as you like, and choose which one each installation runs."],
+    [
+      "installations",
+      "Installations that stay separate",
+      "Every installation keeps its own mods, worlds and configs, so what you do in one leaves the others alone."
+    ],
+    ["backup", "Backups", "Make a backup by hand whenever you want, or have the launcher take one automatically before you play."],
+    [
+      "moddb",
+      "Mods without leaving the launcher",
+      "Browse the ModDB, install and update, search what is already installed, and hold a mod back so Update all skips it."
+    ],
+    ["accounts", "Your accounts", "Keep several Vintage Story accounts saved and switch between them. In the next release."],
+    ["scene", "Make it yours", "Set the launcher's background from the catalog of scenes, or from an image of your own."]
+  ],
+
+  "releases": "Releases",
+  "prerelease": "beta",
+  "allReleases": "All releases on GitHub",
+  "downloads": "Downloads per release",
+  "downloadsNote": "Counted from the installers on each GitHub release when this page was built. Fresh downloads and automatic updates both count, so a bar reads as how many installs moved onto that version, not as new players.",
+  "downloadsLabel": "Downloads per release. {rows}.",
+  "overTime": "Downloads over time",
+  "overTimeNote": "{firstTotal} on {firstDate} to {lastTotal} on {lastDate}, counted once a day.",
+
+  "privacy": "Privacy Policy",
+  "unofficial": "RiftLauncher is unofficial and not affiliated with Anego Studios, the developers of {vintageStory}.",
+  "fork": "RiftLauncher is a fork of {vsLauncher} by {author}. Everything the launcher does today started there."
+}

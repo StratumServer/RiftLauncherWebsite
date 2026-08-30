@@ -1,0 +1,88 @@
+{
+  "name": "Français",
+  "short": "FR",
+  "dateLocale": "fr-FR",
+  "title": "RiftLauncher",
+  "description": "RiftLauncher est un launcher indépendant pour Vintage Story. Installez plusieurs versions, gardez des installations séparées avec leurs propres mods, mondes et configurations, et faites des sauvegardes.",
+  "skip": "Aller au contenu",
+  "docsLink": "Docs",
+  "scene": "Arrière-plan",
+  "changeLanguage": "Changer de langue",
+  "kicker": "Un launcher pour Vintage Story",
+  "headline": "Toutes les versions de Vintage Story, côte à côte.",
+  "lead": "Gardez autant d'installations que vous voulez, chacune avec ses propres mods, mondes et configurations, faites des sauvegardes manuelles ou automatiques avant que quelque chose ne casse, et parcourez le ModDB sans quitter le launcher.",
+  "download": "Télécharger",
+  "downloadFor": "Télécharger pour ",
+  "windows": "Windows",
+  "linux": "Linux",
+  "docs": "Consulter la documentation",
+  "seeFeatures": "Voir ce qu'il fait",
+  "docsNote": "La documentation est en anglais.",
+  "beta": "Préversion bêta : attendez-vous à des aspérités. Sauvegardez vos mondes d'abord.",
+  "platforms": [
+    [
+      "Windows",
+      "riftlauncher-X.X.X-setup.exe"
+    ],
+    [
+      "AppImage Linux",
+      "riftlauncher-X.X.X.AppImage"
+    ],
+    [
+      "Debian et Ubuntu",
+      ".deb"
+    ],
+    [
+      "Fedora et RHEL",
+      ".rpm"
+    ],
+    [
+      "Arch",
+      ".pacman"
+    ]
+  ],
+  "features": "Ce qu'il fait",
+  "cards": [
+    [
+      "versions",
+      "Les versions côte à côte",
+      "Installez autant de versions du jeu que vous voulez, et choisissez celle que chaque installation utilise."
+    ],
+    [
+      "installations",
+      "Des installations bien séparées",
+      "Chaque installation garde ses propres mods, mondes et configurations : ce que vous faites dans l'une ne touche pas aux autres."
+    ],
+    [
+      "backup",
+      "Les sauvegardes",
+      "Faites une sauvegarde à la main quand vous voulez, ou laissez le launcher en prendre une automatiquement avant de jouer."
+    ],
+    [
+      "moddb",
+      "Les mods sans quitter le launcher",
+      "Parcourez le ModDB, installez et mettez à jour, cherchez parmi ce qui est déjà installé, et bloquez un mod pour que « Tout mettre à jour » le laisse de côté."
+    ],
+    [
+      "accounts",
+      "Vos comptes",
+      "Gardez plusieurs comptes Vintage Story enregistrés et passez de l'un à l'autre. Dans la prochaine version."
+    ],
+    [
+      "scene",
+      "À votre goût",
+      "Choisissez le fond du launcher dans le catalogue de scènes, ou mettez une image à vous."
+    ]
+  ],
+  "releases": "Versions publiées",
+  "prerelease": "bêta",
+  "allReleases": "Toutes les versions sur GitHub",
+  "downloads": "Téléchargements par version",
+  "downloadsNote": "Comptés sur les fichiers d'installation de chaque version publiée sur GitHub, au moment où cette page a été construite. Les nouveaux téléchargements et les mises à jour automatiques comptent tous les deux : une barre dit combien d'installations sont passées à cette version, pas combien de joueurs sont arrivés.",
+  "downloadsLabel": "Téléchargements par version. {rows}.",
+  "overTime": "Téléchargements dans le temps",
+  "overTimeNote": "De {firstTotal} le {firstDate} à {lastTotal} le {lastDate}, relevé une fois par jour.",
+  "privacy": "Politique de confidentialité",
+  "unofficial": "RiftLauncher n'est pas officiel et n'est pas affilié à Anego Studios, qui développe {vintageStory}.",
+  "fork": "RiftLauncher est un fork de {vsLauncher} par {author}. Tout ce que le launcher fait aujourd'hui a commencé là."
+}

@@ -25,6 +25,31 @@ today's snapshot; the curve above it appears on its own once that file holds a w
 The only other things this repository holds are the build script, the stylesheet and the landing page
 copy.
 
+## Languages
+
+The landing page is translated; the documentation, the privacy policy and the release notes are not.
+Every string the landing shows lives in `locales/<code>.json`, one file per language. English is the
+default and is served from the root, and each other language gets a folder of its own, so French is
+at `/fr/`. The pages point at each other with `hreflang` links and with the globe in the header,
+which lists every language by its own name and grows as files are added.
+
+### Adding one
+
+1. Copy `locales/en.json` to `locales/<code>.json`, where `<code>` is the language's ISO code.
+2. Translate every value. `name` is the language's name in that language, since that is what the
+   header lists it as, and `short` is the code shown on the button. `dateLocale` is the tag release
+   dates are formatted with, `fr-FR` style. A few strings carry `{name}` holes that are filled with
+   numbers and dates at build time; they have to survive the translation. Say in `docsNote`, in the
+   language you are adding, that the documentation is in English.
+3. Add the code to the `LOCALES` list at the top of `build.mjs`, then `npm run build` and open a
+   pull request. The build writes the new landing, adds it to every other language's `hreflang` list
+   and to the header, and fails if anything it points at does not resolve.
+
+A translation should come from somebody who speaks the language, not from a machine: this is the
+first thing a player reads about the launcher, and a translation that is merely understandable reads
+worse than English does. The documentation stays English for now, which every translated landing
+says under the docs link rather than letting a reader find out by clicking.
+
 ## Building
 
 ```sh
@@ -53,6 +78,10 @@ non-zero listing anything that does not resolve. A page renamed or moved in the 
 therefore fails the build here rather than quietly publishing a dead link. Links pointing at
 repository files that are not documentation, such as the source files the privacy policy references,
 are rewritten to GitHub so they keep working.
+
+Translated pages go through the same check, which is what catches a locale folder reaching for an
+asset at the wrong depth: their links, their stylesheet, icon and background paths, and the
+`hreflang` addresses they point at each other with all have to resolve to a file the build produced.
 
 ## Design notes
 
