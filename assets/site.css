@@ -1,0 +1,1102 @@
+/*
+ * The launcher's surface language, on a page instead of in a window.
+ *
+ * Every scene in the catalog is a photograph of the game, so nothing behind the text is a colour
+ * this stylesheet controls. What a reader actually gets is the text against a stack of translucent
+ * zinc-950 scrims composited over an image, and the only honest way to size those scrims is the
+ * worst case: the image being pure white. The launcher's own arithmetic (tests/text-contrast.test.ts
+ * in the launcher repository) applied to the stack below, against a white image:
+ *
+ *   page scrim 70% + panel 60%  ->  88% effective
+ *     zinc-100 headline  13.65:1
+ *     zinc-200 body      11.83:1
+ *     zinc-400 secondary  5.86:1
+ *     vsl links           5.97:1
+ *
+ *   the same stack + the beta ribbon's own 55%  ->  94.6% effective
+ *     zinc-200 ribbon text  14.21:1
+ *     zinc-400 ribbon text   7.03:1
+ *
+ * The launcher pairs a 70% shell with 40% panels, which lands zinc-400 at 4.76:1. That clears the
+ * 4.5:1 bar with almost nothing to spare, which is fine for short labels and thin for a site that is
+ * mostly running prose, so the panels here are heavier. No text is ever painted on the page scrim
+ * alone: zinc-400 reads 3.01:1 there, well under the bar.
+ *
+ * The download button is opaque, so nothing composites: white on vs is 6.88:1.
+ *
+ * The scene picker hangs off the header and onto the page, so it cannot count on a panel underneath
+ * it. It carries its own 92%, which over the page scrim is 97.6% effective:
+ *     zinc-400 tile label   7.48:1
+ *     zinc-200 tile label  15.10:1
+ *
+ * The picker's selected tile is marked the way the launcher marks a selection, an opaque vsl border,
+ * and that border is the only thing saying which scene is showing, so it needs the 3:1 a non-text
+ * indicator needs. It touches the popup on one side, 7.62:1, and a 2px zinc-950 inset on the other,
+ * 7.91:1, so it never has to be read against the photograph itself. The 10% white hairline around
+ * the panels and the unselected tiles is decoration, not state, and is not held to that bar.
+ *
+ * The icons are line work at the same colours as the links they replace, so they clear the 3:1 a
+ * non-text mark needs several times over: zinc-400 in the bar 5.86:1, vsl on hover and in the
+ * footer 5.97:1. An icon with no word beside it carries a ring instead of an underline, at those
+ * same two ratios.
+ *
+ * The landing's feature cards and release cards sit inside a panel and carry the beta ribbon's own
+ * 55%, so they land on the stack the ribbon already uses, 94.6% effective:
+ *     zinc-100 card heading  16.40:1
+ *     zinc-200 card text     14.21:1
+ *     zinc-400 dates         7.03:1
+ *     vsl links              7.17:1
+ *
+ * The beta chip is a 55% zinc-950 fill on a release card, 97.6% effective, with vsl text and a vsl
+ * border: text 7.62:1, and the border 7.17:1 against the card it is drawn on. The word beta is what
+ * says a release is a prerelease, so the chip's own outline is decoration and not held to 3:1.
+ *
+ * The download bars sit on a card with the rest of the releases, and they are the one graphic here
+ * carrying a number, so they are held to the 3:1 a non-text mark needs. The brand's darker vs
+ * (#7e501e) reads 2.62:1 on that card and fails it; vsl reads 7.17:1 and is what the bars are
+ * painted in, the curve above them included. Their track is a 10% white hairline, decoration under a
+ * bar whose length is printed beside it either way. The count inside a bar is zinc-950 on vsl,
+ * 7.91:1, and the tag above it, along with a count too long to fit inside its bar, is zinc-200 on
+ * the card at 14.21:1.
+ */
+
+:root {
+  --vs: #7e501e;
+  --vsl: #d49754;
+  --vsd: #4f3110;
+  --zinc-950: #09090b;
+  --text: #e4e4e7;
+  --muted: #a1a1aa;
+  --panel: rgba(9, 9, 11, 0.6);
+  --hairline: rgba(161, 161, 170, 0.16);
+  --edge: rgba(255, 255, 255, 0.1);
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-padding-top: 5rem;
+}
+
+/* A column the height of the window, so the footer sits on the bottom edge of a short page. */
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--zinc-950);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+/* The scene and the scrim that makes it a surface, both out of the way of everything else. */
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-color: var(--zinc-950);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: rgba(9, 9, 11, 0.7);
+}
+
+a {
+  color: var(--vsl);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+a:hover {
+  color: #e6b381;
+}
+
+:focus-visible {
+  outline: 2px solid var(--vsl);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 10;
+  padding: 0.6rem 1rem;
+  background: #09090b;
+  color: var(--text);
+}
+
+.skip:focus {
+  left: 0.5rem;
+  top: 0.5rem;
+}
+
+/* ------------------------------------------------------------------ chrome */
+
+/* The bar owns a stacking context above the page so the picker's panel hangs over the panels. */
+.topbar {
+  position: relative;
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0.75rem clamp(1rem, 4vw, 2.5rem);
+  background: var(--panel);
+  border-bottom: 1px solid var(--edge);
+  backdrop-filter: blur(6px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.brand img {
+  width: 1.7rem;
+  height: auto;
+}
+
+.brand:hover {
+  color: var(--vsl);
+}
+
+/* Held to the right even when the bar wraps, which is what keeps the picker's panel on screen. */
+.topbar-end {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: none;
+}
+
+/*
+ * An icon on its own has no text to underline, so the rule that every link is underlined becomes a
+ * ring and a fill here: the target is always outlined, and hover and focus light it up.
+ */
+.icon-only {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.icon-only a {
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.icon-only a:hover,
+.icon-only a:focus-visible {
+  color: var(--vsl);
+  border-color: var(--vsl);
+  background: rgba(9, 9, 11, 0.6);
+}
+
+/* The width is explicit because auto side margins in the body's column would shrink these to fit. */
+.layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+  width: 100%;
+  max-width: 78rem;
+  margin: 0 auto;
+  padding: 1.5rem clamp(0.75rem, 3vw, 2rem);
+}
+
+.layout-wide {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 60rem;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+  backdrop-filter: blur(6px);
+}
+
+/* ---------------------------------------------------------------- sidebar */
+
+.nav-shell {
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+  backdrop-filter: blur(6px);
+  padding: 0.75rem 1rem 1rem;
+  position: sticky;
+  top: 1.5rem;
+  max-height: calc(100vh - 3rem);
+  overflow-y: auto;
+}
+
+.nav-summary {
+  display: none;
+}
+
+.nav-heading {
+  margin: 1.25rem 0 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav li ul {
+  margin-left: 0.6rem;
+  padding-left: 0.6rem;
+  border-left: 1px solid var(--hairline);
+}
+
+.nav a {
+  display: block;
+  padding: 0.2rem 0.4rem;
+  border-radius: 5px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.94rem;
+}
+
+.nav a:hover {
+  color: var(--vsl);
+  background: rgba(9, 9, 11, 0.5);
+}
+
+.nav a[aria-current="page"] {
+  color: var(--vsl);
+  background: rgba(79, 49, 16, 0.55);
+  box-shadow: inset 2px 0 0 var(--vsl);
+}
+
+.nav summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.nav summary::-webkit-details-marker {
+  display: none;
+}
+
+.nav summary::before {
+  content: "";
+  flex: none;
+  width: 0;
+  height: 0;
+  border-left: 5px solid var(--muted);
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform 0.12s ease;
+}
+
+.nav details[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.nav summary a {
+  flex: 1;
+}
+
+/* ------------------------------------------------------------------ prose */
+
+.prose {
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.prose > * {
+  max-width: 72ch;
+}
+
+.prose h1 {
+  margin: 0 0 1.25rem;
+  font-size: clamp(1.7rem, 4vw, 2.25rem);
+  line-height: 1.2;
+}
+
+.prose h2 {
+  margin: 2.25rem 0 0.75rem;
+  font-size: 1.4rem;
+  line-height: 1.3;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.prose h3 {
+  margin: 1.75rem 0 0.5rem;
+  font-size: 1.15rem;
+}
+
+.prose h4,
+.prose h5,
+.prose h6 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1rem;
+}
+
+.prose p,
+.prose ul,
+.prose ol {
+  margin: 0 0 1rem;
+}
+
+.prose li {
+  margin-bottom: 0.35rem;
+}
+
+.prose hr {
+  max-width: 72ch;
+  border: 0;
+  border-top: 1px solid var(--hairline);
+  margin: 2rem 0;
+}
+
+.prose blockquote {
+  margin: 0 0 1rem;
+  padding: 0.1rem 1rem;
+  border-left: 3px solid var(--vs);
+  color: var(--muted);
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid var(--hairline);
+}
+
+.prose figure {
+  margin: 1.5rem 0;
+  max-width: 72ch;
+}
+
+.prose figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.87rem;
+  color: var(--muted);
+}
+
+.prose figcaption p {
+  margin: 0;
+}
+
+code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+}
+
+.prose :not(pre) > code {
+  padding: 0.12em 0.35em;
+  border-radius: 4px;
+  background: rgba(9, 9, 11, 0.65);
+  border: 1px solid var(--hairline);
+}
+
+.prose pre {
+  margin: 0 0 1rem;
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+  background: rgba(9, 9, 11, 0.7);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  line-height: 1.5;
+}
+
+.table-scroll {
+  max-width: 72ch;
+  overflow-x: auto;
+  margin: 0 0 1rem;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+}
+
+.prose table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.94rem;
+}
+
+.prose th,
+.prose td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.prose th {
+  background: rgba(9, 9, 11, 0.55);
+  font-weight: 600;
+}
+
+.prose tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* ---------------------------------------------------- callouts and blocks */
+
+.callout {
+  max-width: 72ch;
+  margin: 1.25rem 0;
+  padding: 0.9rem 1.1rem;
+  border-radius: 8px;
+  border: 1px solid var(--hairline);
+  border-left: 4px solid var(--muted);
+  background: rgba(9, 9, 11, 0.55);
+}
+
+.callout > :last-child {
+  margin-bottom: 0;
+}
+
+.callout-info {
+  border-left-color: var(--vsl);
+}
+
+.callout-warning {
+  border-left-color: #eab308;
+}
+
+.callout-danger {
+  border-left-color: #f87171;
+}
+
+.callout-success {
+  border-left-color: #4ade80;
+}
+
+.card {
+  max-width: 72ch;
+  margin: 0.75rem 0;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: rgba(9, 9, 11, 0.55);
+}
+
+.card p {
+  margin: 0;
+}
+
+.stepper {
+  counter-reset: step;
+  max-width: 72ch;
+  margin: 1.25rem 0;
+}
+
+.step {
+  counter-increment: step;
+  position: relative;
+  padding: 0 0 0.25rem 2.5rem;
+  border-left: 1px solid var(--hairline);
+  margin-left: 0.85rem;
+}
+
+.step::before {
+  content: counter(step);
+  position: absolute;
+  left: -0.85rem;
+  top: 0.15rem;
+  width: 1.7rem;
+  height: 1.7rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--vsd);
+  border: 1px solid var(--vsl);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.stepper .step:last-child {
+  border-left-color: transparent;
+}
+
+/* ---------------------------------------------------------------- landing */
+
+/* One editorial column. The emblem opens it, echoed small in the bar. */
+.hero-emblem {
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-bottom: 1rem;
+}
+@media (min-width: 100rem) {
+  .hero-emblem {
+    width: 4.5rem;
+    height: 4.5rem;
+  }
+}
+.hero {
+  padding: clamp(1.75rem, 5vw, 3.25rem) 0 0;
+}
+
+/* Full panel width; the padding alone frames the text. */
+.hero-column {
+  padding: 0 clamp(1.25rem, 5vw, 3rem) clamp(1.75rem, 4vw, 2.5rem);
+}
+
+.kicker {
+  margin: 0 0 0.6rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* Sized so the sentence lands on two lines at the width the column gives it, phone included. */
+.hero h1 {
+  margin: 0 0 1rem;
+  font-size: clamp(1.6rem, 5vw, 2.75rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: #f4f4f5;
+}
+
+.lead {
+  margin: 0 0 1.75rem;
+  font-size: 1.05rem;
+  color: var(--text);
+}
+
+.cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+  margin: 0 0 1.25rem;
+}
+
+.quiet {
+  font-weight: 600;
+}
+
+/* The beta caveat, one line next to the button rather than a paragraph of its own. */
+.ribbon {
+  display: inline-block;
+  margin: 0 0 1.5rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 6px;
+  border: 1px solid var(--edge);
+  border-left: 3px solid #eab308;
+  background: rgba(9, 9, 11, 0.55);
+  color: var(--text);
+  font-size: 0.87rem;
+}
+
+.button {
+  display: inline-block;
+  padding: 0.7rem 1.75rem;
+  border-radius: 8px;
+  background: var(--vs);
+  border: 1px solid var(--vsl);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.button:hover {
+  background: #96601f;
+  color: #fff;
+}
+
+.platforms {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.5rem;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.platforms span {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.85em;
+}
+
+.platforms a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* ------------------------------------------------- features and releases */
+
+/* Hero, features, releases: one column of panels on the landing's own axis and width. */
+.landing {
+  display: grid;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+.section {
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  min-width: 0;
+}
+
+.section > h2 {
+  margin: 0 0 1.25rem;
+  font-size: clamp(1.35rem, 3vw, 1.7rem);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: #f4f4f5;
+}
+
+/* Six cards: three and three where there is room, then two and two, then one column on a phone. */
+.cards {
+  list-style: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 34rem) {
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 52rem) {
+  .cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The same 55% the beta ribbon carries, over the panel: a card is readable without a second border. */
+.feature {
+  padding: 1.1rem 1.2rem 1.25rem;
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  background: rgba(9, 9, 11, 0.55);
+}
+
+.feature .icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--vsl);
+}
+
+.feature h3 {
+  margin: 0.5rem 0 0.35rem;
+  font-size: 1.02rem;
+  line-height: 1.3;
+  color: #f4f4f5;
+}
+
+.feature p {
+  margin: 0;
+  font-size: 0.93rem;
+  color: var(--text);
+}
+
+/* A release note takes the prose treatment for type, but spans its card: the landing's cards
+   set their own width, so the docs' reading measure does not apply here. */
+.release.prose > *,
+.release .prose > * {
+  max-width: none;
+}
+
+.release {
+  margin: 0 0 1rem;
+  padding: 1.1rem 1.3rem;
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  background: rgba(9, 9, 11, 0.55);
+}
+
+.release > :first-child {
+  margin-top: 0;
+}
+
+.release > :last-child {
+  margin-bottom: 0;
+}
+
+.release-latest > h3 {
+  font-size: 1.25rem;
+}
+
+/* The note's own heading, two levels down from where it was written, still ahead of its paragraphs. */
+.release h4 {
+  font-size: 1.05rem;
+  color: #f4f4f5;
+}
+
+.release-tag {
+  font-family: var(--mono);
+}
+
+.release-date {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 0.87rem;
+  white-space: nowrap;
+}
+
+details.release > summary {
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+details.release[open] > summary {
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--hairline);
+}
+
+/* The word carries the meaning; the outline is only there to group it. */
+.chip {
+  display: inline-block;
+  padding: 0.05rem 0.5rem;
+  border: 1px solid var(--vsl);
+  border-radius: 999px;
+  background: rgba(9, 9, 11, 0.55);
+  color: var(--vsl);
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  vertical-align: 0.1em;
+}
+
+.more {
+  margin: 1.25rem 0 0;
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------- downloads */
+
+/*
+ * Drawn by the build from the counts GitHub reported that morning. There is no viewBox on purpose:
+ * bar widths are percentages of the chart's own box and everything else is fixed pixels, so the
+ * chart fills the panel at any width and the labels never scale down to unreadable on a phone.
+ */
+.chart-block > svg {
+  max-width: none;
+  display: block;
+  margin: 0 0 0.75rem;
+}
+
+.bar-track {
+  fill: rgba(255, 255, 255, 0.1);
+}
+
+.bar-fill {
+  fill: var(--vsl);
+}
+
+.chart text {
+  font-family: var(--sans);
+  font-size: 0.85rem;
+}
+
+.bar-tag {
+  fill: var(--text);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+}
+
+.bar-count {
+  fill: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.bar-count-in {
+  fill: var(--zinc-950);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A sparkline: the shape is the point, so it stretches, and the stroke stays 2px while it does. */
+.curve {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: 5rem;
+  margin: 0 0 0.5rem;
+}
+
+.curve polyline {
+  stroke: var(--vsl);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.chart-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* ----------------------------------------------------------- scene picker */
+
+/*
+ * The launcher's background picker, in the site's header: the button opens the catalogue and each
+ * tile swaps the photograph behind everything. The tiles are buttons so they are reachable by
+ * keyboard, and the one showing carries aria-pressed along with the launcher's own selected
+ * treatment, an opaque vsl border.
+ */
+.picker {
+  position: relative;
+}
+
+.picker > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 2.4rem;
+  padding: 0 0.7rem;
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.picker > summary::-webkit-details-marker {
+  display: none;
+}
+
+.picker > summary:hover,
+.picker[open] > summary {
+  color: var(--vsl);
+  border-color: var(--vsl);
+  background: rgba(9, 9, 11, 0.6);
+}
+
+.picker-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.5rem);
+  z-index: 20;
+  width: min(88vw, 27rem);
+  max-height: min(70vh, 30rem);
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  padding: 0.75rem;
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+  /* Opaque enough to read over raw scene, since the panel hangs off the bar and onto the page. */
+  background: rgba(9, 9, 11, 0.92);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+}
+
+.tile {
+  width: 100%;
+  padding: 2px;
+  border: 2px solid var(--edge);
+  border-radius: 8px;
+  background: var(--zinc-950);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.72rem;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tile img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+
+.tile span {
+  display: block;
+  padding: 0.3rem 0.15rem 0.1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tile:hover {
+  border-color: var(--muted);
+  color: var(--text);
+}
+
+.tile[aria-pressed="true"] {
+  border-color: var(--vsl);
+  color: var(--text);
+}
+
+/* ----------------------------------------------------------------- footer */
+
+.footer {
+  width: 100%;
+  max-width: 78rem;
+  margin: 0 auto 2rem;
+  padding: 1.5rem clamp(1rem, 4vw, 2rem);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* The footer keeps the words beside the marks, and the word carries the underline. */
+.footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.icon-row a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  text-decoration: none;
+}
+
+.icon-row a span {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.icon-row a:hover span {
+  text-decoration-thickness: 2px;
+}
+
+.footer p {
+  margin: 0 0 0.5rem;
+}
+
+.footer p:last-child {
+  margin-bottom: 0;
+}
+
+/* ----------------------------------------------------------------- narrow */
+
+@media (max-width: 60rem) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .nav-shell {
+    position: static;
+    max-height: none;
+  }
+
+  .nav-summary {
+    display: block;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0.15rem 0;
+  }
+
+  .nav-shell[open] .nav {
+    max-height: 55vh;
+    overflow-y: auto;
+    margin-top: 0.75rem;
+  }
+}
+
+/* ------------------------------------------------------------------- wide */
+
+/*
+ * Past 1600px the type, the panel and the picker's thumbnails take the room that comes with the
+ * wider screen; the column stays centred. Nothing here changes a colour or an opacity, so every
+ * ratio in the header still holds; the tiles only grow, keeping the same 2px borders.
+ */
+@media (min-width: 100rem) {
+  .layout,
+  .footer {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .layout-wide {
+    max-width: 80rem;
+  }
+
+  .hero {
+    padding-top: 4.5rem;
+  }
+
+  .hero-column {
+    padding: 0 4rem 3rem;
+  }
+
+  .brand img {
+    width: 2rem;
+  }
+
+  .hero h1 {
+    /* One full line across the 80rem panel; sized to fit, not to wrap. */
+    font-size: 2.95rem;
+    white-space: nowrap;
+  }
+
+  .lead {
+    font-size: 1.12rem;
+  }
+
+  /* Four across puts the eleven scenes in three rows, so the panel never has to scroll. */
+  .picker-panel {
+    width: 34rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.7rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

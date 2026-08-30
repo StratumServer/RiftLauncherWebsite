@@ -1,0 +1,12 @@
+{
+  "name": "riftlauncher-website",
+  "private": true,
+  "type": "module",
+  "description": "Website and documentation for RiftLauncher",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "marked": "^15.0.7"
+  }
+}

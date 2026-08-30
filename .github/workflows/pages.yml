@@ -1,0 +1,58 @@
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  # The build reads docs/ and the background catalog from the launcher repository, so it runs again
+  # every morning and picks up whatever merged there without anyone touching this repository.
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  # The build records one download total a day into data/downloads-history.json and pushes it back,
+  # which is the only thing on this repository that writes.
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+        id: pages
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          SITE_URL: ${{ steps.pages.outputs.base_url }}
+          # The GitHub API only ever says how many downloads there have been, never when they
+          # happened. RECORD_DOWNLOADS makes the build keep today's total, so a year from now the
+          # site has a curve nobody had to collect by hand.
+          RECORD_DOWNLOADS: "1"
+      # Keeping the point is not worth failing a deploy over: if the API was down the build already
+      # skipped the section and wrote nothing, and there is simply nothing to commit.
+      - name: Keep today's download totals
+        continue-on-error: true
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/downloads-history.json
+          git diff --cached --quiet || { git commit -m "Record download totals for $(date -u +%F)" && git push; }
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - uses: actions/deploy-pages@v4
+        id: deployment
