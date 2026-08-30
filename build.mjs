@@ -36,7 +36,9 @@ const MODDB = "https://mods.vintagestory.at/riftlauncher"
  * one. Every link and asset on the page is relative, so the site works unchanged under the repository
  * path a project Pages site is served from, at a custom domain, or opened straight from disk.
  */
-const SITE_URL = (process.env.SITE_URL || "https://stratumserver.github.io/RiftLauncherWebsite/").replace(/\/?$/, "/")
+// Pages reports the site URL with an http scheme until its own HTTPS enforcement is on, which it
+// never is behind the Cloudflare proxy that actually serves the TLS, so the scheme is forced here.
+const SITE_URL = (process.env.SITE_URL || "https://stratumserver.github.io/RiftLauncherWebsite/").replace(/^http:/, "https:").replace(/\/?$/, "/")
 
 /** A shallow checkout of one branch of the launcher repository, or a local path when one is given. */
 function checkout(branch, override) {
