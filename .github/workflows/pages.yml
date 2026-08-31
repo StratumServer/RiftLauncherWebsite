@@ -3,14 +3,18 @@ name: Pages
 on:
   push:
     branches: [main]
-  # The build reads docs/ and the background catalog from the launcher repository, so it runs again
-  # every morning and picks up whatever merged there without anyone touching this repository.
+  # The build reads docs/ and the background catalog from the launcher repository and the releases
+  # from its API, so it runs again every quarter hour and picks up a new release, a docs merge or
+  # moved download counters without anyone touching this repository. Actions minutes are free on a
+  # public repository, and fetching at build time is what keeps visitors' browsers from calling
+  # third parties.
   schedule:
-    - cron: "17 5 * * *"
+    - cron: "*/15 * * * *"
   workflow_dispatch:
 
 permissions:
   # The build records one download total a day into data/downloads-history.json and pushes it back,
+  # whatever the run frequency: the history keeps one point per day, the extra runs only redeploy.
   # which is the only thing on this repository that writes.
   contents: write
   pages: write
