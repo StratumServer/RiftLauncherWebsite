@@ -453,8 +453,19 @@ ${footer(out, t)}
  */
 async function fetchReleases() {
   try {
+    /*
+     * Actions runners share their addresses, so an unauthenticated call from one is rate-limited
+     * against everyone else's and answers 403 often enough to drop the section from a deploy. The
+     * workflow's own token raises that limit and needs no permission beyond reading this repository.
+     * A local build without one still works: it is the same anonymous call, from one address.
+     */
+    const token = process.env.GITHUB_TOKEN
     const response = await fetch(`https://api.github.com/repos/StratumServer/RiftLauncher/releases?per_page=100`, {
-      headers: { accept: "application/vnd.github+json", "user-agent": "RiftLauncherWebsite build" }
+      headers: {
+        accept: "application/vnd.github+json",
+        "user-agent": "RiftLauncherWebsite build",
+        ...(token ? { authorization: `Bearer ${token}` } : {})
+      }
     })
     if (!response.ok) throw new Error(`GitHub answered ${response.status}`)
     const list = await response.json()

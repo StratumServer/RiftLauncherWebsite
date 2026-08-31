@@ -44,6 +44,10 @@ jobs:
           # happened. RECORD_DOWNLOADS makes the build keep today's total, so a year from now the
           # site has a curve nobody had to collect by hand.
           RECORD_DOWNLOADS: "1"
+          # Runners share addresses, so the anonymous release call is rate-limited against every
+          # other project on the same one and drops the section from a deploy now and then. The
+          # run's own token lifts that; it reads public releases and nothing else.
+          GITHUB_TOKEN: ${{ github.token }}
       # Keeping the point is not worth failing a deploy over: if the API was down the build already
       # skipped the section and wrote nothing, and there is simply nothing to commit.
       - name: Keep today's download totals
