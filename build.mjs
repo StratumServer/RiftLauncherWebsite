@@ -11,6 +11,7 @@ import { execFileSync } from "node:child_process"
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs"
 import { dirname, join, posix, relative } from "node:path"
 import { fileURLToPath } from "node:url"
+import { execSync } from "node:child_process"
 import { marked } from "marked"
 
 /**
@@ -358,6 +359,7 @@ function shell({ out, title, description, body, wide, t = EN, localized = false 
 <meta property="og:description" content="${escape(description)}">
 <meta property="og:image" content="${SITE_URL}branding/riftlauncher-full.png">
 <meta property="og:url" content="${SITE_URL}${out.replace(/(^|\/)index\.html$/, "$1")}">
+${out === "index.html" ? `<meta name="build-sources" content="dev:${SOURCE_REFS.dev} bg:${SOURCE_REFS.bg} rel:${SOURCE_REFS.rel} at:${SOURCE_REFS.at}">` : ""}
 <meta property="og:locale" content="${t.code}">${localized ? `\n${alternates(out)}` : ""}
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="${asset("icon.png")}">
@@ -463,6 +465,20 @@ async function fetchReleases() {
 }
 
 const releases = await fetchReleases()
+
+/**
+ * The freshness stamp the quarter-hour cron reads off the live page: it only rebuilds when one of
+ * these moved, so a run where nothing changed costs seconds instead of a build and a deploy.
+ * `at` lets the counters refresh at least daily even when no source moved.
+ */
+const SOURCE_REFS = {
+  dev: execSync("git -C .cache/dev rev-parse HEAD").toString().trim().slice(0, 12),
+  bg: execSync("git -C .cache/backgrounds rev-parse HEAD").toString().trim().slice(0, 12),
+  rel: releases ? String(releases[0]?.id ?? "none") : "unavailable",
+  at: new Date().toISOString().slice(0, 10)
+}
+
+
 
 /** The installers, without the update feed and patch files that ship beside them. */
 const installers = (release) => release.assets.filter((asset) => !/\.(ya?ml|blockmap)$/i.test(asset.name))

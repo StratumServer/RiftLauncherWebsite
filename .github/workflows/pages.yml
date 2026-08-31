@@ -25,7 +25,35 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Reads the freshness stamp off the live page and compares it with the sources' current state, so
+  # a quarter-hour tick where nothing moved ends here in seconds. Push and manual runs skip the
+  # gate. If the live page or its stamp cannot be read, the answer is "changed", never "skip".
+  check:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    outputs:
+      changed: ${{ steps.compare.outputs.changed }}
+    steps:
+      - id: compare
+        run: |
+          set -u
+          live=$(curl -sf --max-time 20 "https://riftlauncher.stratumvs.dev/" | grep -o 'name="build-sources" content="[^"]*"' || true)
+          dev=$(git ls-remote https://github.com/StratumServer/RiftLauncher.git refs/heads/dev | cut -c1-12)
+          bg=$(git ls-remote https://github.com/StratumServer/RiftLauncher.git refs/heads/backgrounds | cut -c1-12)
+          rel=$(curl -sf --max-time 20 "https://api.github.com/repos/StratumServer/RiftLauncher/releases?per_page=1" | grep -m1 '"id":' | grep -o '[0-9]*' | head -1 || echo unavailable)
+          today=$(date -u +%F)
+          echo "live:    $live"
+          echo "wanted:  dev:$dev bg:$bg rel:$rel at:$today"
+          if [ -n "$live" ] && echo "$live" | grep -q "dev:$dev " && echo "$live" | grep -q "bg:$bg " && echo "$live" | grep -q "rel:$rel " && echo "$live" | grep -q "at:$today"; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Nothing moved, skipping the build."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
   deploy:
+    needs: [check]
+    if: always() && (github.event_name != 'schedule' || needs.check.outputs.changed == 'true')
     runs-on: ubuntu-latest
     environment:
       name: github-pages
