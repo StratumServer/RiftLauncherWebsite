@@ -106,6 +106,9 @@ body {
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
+  /* The dark underlay is what shows while the scene file arrives, so a slow first load dims
+     instead of flashing; once cached, later pages paint the same file immediately. */
+  transition: opacity 300ms ease;
 }
 
 .scrim {

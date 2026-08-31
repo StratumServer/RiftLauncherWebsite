@@ -383,9 +383,12 @@ ${body}
 </div>
 ${footer(out, t)}
 <script>
-// One scene per visit, chosen from the launcher's own catalog. The stylesheet already names a
-// default, so a reader with scripting off still gets a background rather than a blank page.
-// This is also what reveals the header's picker and wires its thumbnails to the scene.
+// One scene per visit, chosen from the launcher's own catalog on the first page and kept for the
+// whole session after that, so moving between pages neither reshuffles the backdrop nor reloads
+// it: the browser serves the same cached file everywhere. Picking a scene in the header keeps it
+// too. The stylesheet already names a default, so a reader with scripting off still gets a
+// background rather than a blank page. This also reveals the header's picker and wires its
+// thumbnails to the scene.
 (function () {
   var s = ${JSON.stringify(sceneUrls)}
   var names = ${JSON.stringify(catalog.map((scene) => scene.name))}
@@ -394,17 +397,27 @@ ${footer(out, t)}
   var label = picker.querySelector(".picker-name")
   var summary = picker.querySelector("summary")
   var tiles = picker.querySelectorAll(".tile")
+  var remember = function (i) {
+    try { sessionStorage.setItem("scene", String(i)) } catch (e) {}
+  }
   function show(i) {
     scene.style.backgroundImage = 'url("' + s[i] + '")'
     label.textContent = names[i]
     for (var t = 0; t < tiles.length; t++) tiles[t].setAttribute("aria-pressed", t === i ? "true" : "false")
   }
-  show(Math.floor(Math.random() * s.length))
+  var kept = null
+  try { kept = parseInt(sessionStorage.getItem("scene"), 10) } catch (e) {}
+  if (kept === null || isNaN(kept) || kept < 0 || kept >= s.length) {
+    kept = Math.floor(Math.random() * s.length)
+    remember(kept)
+  }
+  show(kept)
   picker.hidden = false
   for (var i = 0; i < tiles.length; i++)
     (function (index, tile) {
       tile.addEventListener("click", function () {
         show(index)
+        remember(index)
         picker.open = false
         summary.focus()
       })
