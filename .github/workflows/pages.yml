@@ -3,9 +3,9 @@ name: Pages
 on:
   push:
     branches: [main]
-  # The launcher repository dispatches this event when a release is published, when docs change on
-  # dev, or when the backgrounds branch moves, so the site rebuilds on real events and never on a
-  # timer.
+  # Kept as a hook: anything holding a token with Actions access to this repository can dispatch
+  # this event to trigger a rebuild. Nothing sends it today; docs merges reach the site through a
+  # manual run instead.
   repository_dispatch:
     types: [source-updated]
   workflow_dispatch:
