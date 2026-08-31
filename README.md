@@ -9,21 +9,27 @@ rendered documentation. Published at
 Nothing in this repository is a copy of the launcher's documentation. `build.mjs` reads the `docs/`
 tree and `PRIVACY.md` from the launcher's `dev` branch, and the background scenes from its
 `backgrounds` branch, both fetched fresh on every run. `docs/SUMMARY.md` alone decides the sidebar,
-so adding a page there is all it takes to see it here. The site rebuilds on every push and once a
-day, which is how a documentation merge reaches the published pages without anyone editing this
-repository.
+so adding a page there is all it takes to see it here. Nothing rebuilds on a schedule. The site
+builds on a push to this repository, and on the `source-updated` event the launcher repository
+dispatches when it publishes a release, changes the docs on `dev` or moves `backgrounds`, which is
+how a documentation merge reaches the published pages without anyone editing this repository.
 
-The landing page's releases section comes from the GitHub API, read once at build time rather than
-from the reader's browser, so a visit does not reach a third party. If that request fails the section
-is skipped with a warning and the build still finishes; the daily run picks it up again the next
-morning.
+The landing page's releases section is built from the GitHub API, and `assets/live.js` makes that
+same call again from the reader's browser to refresh the download counts on the page. What the build
+renders is the whole section for a reader with scripting off, for a crawler and for anyone GitHub
+rate-limits, so the script only ever replaces numbers that are already there. That call is the one
+third party this site reaches on its own. Either end can fail without consequence: the build skips
+the section with a warning and finishes, and the script leaves the page exactly as it found it and
+says nothing to the reader. When GitHub has a release newer than the built one, the script updates
+the header and puts a line above the notes linking the new ones on GitHub, since it renders no
+markdown of its own.
 
 The API reports how many downloads a release has had, never when they happened, so the workflow keeps
 one total a day in `data/downloads-history.json` and commits it back. The bar chart is drawn from
 today's snapshot; the curve above it appears on its own once that file holds a week of points.
 
-The only other things this repository holds are the build script, the stylesheet and the landing page
-copy.
+The only other things this repository holds are the build script, the stylesheet, the script that
+refreshes the counts, and the landing page copy.
 
 ## Languages
 

@@ -442,9 +442,11 @@ ${footer(out, t)}
 // ---------------------------------------------------------------- releases
 
 /*
- * The releases come from the GitHub API at build time rather than from the reader's browser, for the
- * same reason there are no embedded players on this site: a visit should not reach a third party
- * before the reader asks it to. The daily Pages run is what keeps the section current.
+ * The releases come from the GitHub API here, at build time, and the section this renders is the
+ * whole of it for a reader with scripting off, for a crawler, and for anyone GitHub rate-limits.
+ * assets/live.js then repeats the same call from the browser and refreshes the counts in place, so
+ * the numbers are current between two dispatched rebuilds. That call is the one third party this
+ * site reaches on its own; everything else here still waits to be asked.
  *
  * A GitHub hiccup must not take the site down, so a failed or unreadable answer skips the section
  * with a warning and the build carries on. The link check stays strict either way.
@@ -467,9 +469,9 @@ async function fetchReleases() {
 const releases = await fetchReleases()
 
 /**
- * The freshness stamp the quarter-hour cron reads off the live page: it only rebuilds when one of
- * these moved, so a run where nothing changed costs seconds instead of a build and a deploy.
- * `at` lets the counters refresh at least daily even when no source moved.
+ * What the published page was built from, readable off the page itself: which commit of each source
+ * branch, which release was newest, and the day it ran. Nothing polls it now that the launcher
+ * repository dispatches an event when a source moves, but it is what says whether a deploy landed.
  */
 const SOURCE_REFS = {
   dev: execSync("git -C .cache/dev rev-parse HEAD").toString().trim().slice(0, 12),
@@ -516,23 +518,29 @@ function notes(markdown) {
  * A build-time bar chart, drawn as plain SVG with no script and no library. There is no viewBox: the
  * bars are widths in percent and everything else is a fixed number of pixels, so the chart fills the
  * panel at any width while the labels stay the size they were authored at, phone included.
+ *
+ * Each bar is one group, translated down the chart and carrying the id of the release it counts, so
+ * assets/live.js can redraw the rows from fresher counts without guessing which bar is which. That
+ * script writes the same markup this does; the two have to move together.
  */
+const ROW = 46
+
+function bar(row, most, i) {
+  const width = Math.max((row.count / most) * 100, 1).toFixed(2)
+  // The number sits inside the bar when there is room for it, and just past the end when there is not.
+  const number =
+    width >= 22
+      ? `<text class="bar-count-in" x="${width}%" dx="-10" y="34" text-anchor="end">${row.count}</text>`
+      : `<text class="bar-count" x="${width}%" dx="10" y="34">${row.count}</text>`
+  return `<g class="bar-row" data-release-id="${escape(String(row.id))}" transform="translate(0,${i * ROW})"><text class="bar-tag" x="0" y="13">${escape(row.tag)}</text><rect class="bar-track" x="0" y="21" width="100%" height="18" rx="9"/><rect class="bar-fill" x="0" y="21" width="${width}%" height="18" rx="9"/>${number}</g>`
+}
+
+const chartLabel = (rows, t) => fill(t.downloadsLabel, { rows: rows.map((row) => `${row.tag}, ${row.count}`).join(". ") })
+
 function barChart(rows, t) {
-  const ROW = 46
   const most = Math.max(...rows.map((row) => row.count), 1)
-  const body = rows
-    .map((row, i) => {
-      const y = i * ROW
-      const width = Math.max((row.count / most) * 100, 1).toFixed(2)
-      // The number sits inside the bar when there is room for it, and just past the end when there is not.
-      const number =
-        width >= 22
-          ? `<text class="bar-count-in" x="${width}%" dx="-10" y="${y + 34}" text-anchor="end">${row.count}</text>`
-          : `<text class="bar-count" x="${width}%" dx="10" y="${y + 34}">${row.count}</text>`
-      return `<text class="bar-tag" x="0" y="${y + 13}">${escape(row.tag)}</text><rect class="bar-track" x="0" y="${y + 21}" width="100%" height="18" rx="9"/><rect class="bar-fill" x="0" y="${y + 21}" width="${width}%" height="18" rx="9"/>${number}`
-    })
-    .join("")
-  return `<svg class="chart" width="100%" height="${rows.length * ROW}" role="img" aria-label="${escape(fill(t.downloadsLabel, { rows: rows.map((row) => `${row.tag}, ${row.count}`).join(". ") }))}">${body}</svg>`
+  const body = rows.map((row, i) => bar(row, most, i)).join("")
+  return `<svg class="chart" width="100%" height="${rows.length * ROW}" role="img" aria-label="${escape(chartLabel(rows, t))}">${body}</svg>`
 }
 
 /*
@@ -594,8 +602,22 @@ function releasesSection(t) {
         `<details class="release prose"><summary>${head(release)} <span class="release-date">${escape(day(release.published_at, t))}</span></summary>${notes(release.body)}</details>`
     )
     .join("")
-  const rows = releases.map((release) => ({ tag: release.tag_name, count: totalOf(release) }))
-  return `<section id="releases" class="panel section" aria-labelledby="releases-heading">
+  const rows = releases.map((release) => ({ id: release.id, tag: release.tag_name, count: totalOf(release) }))
+  /*
+   * What assets/live.js needs to redraw this section from the reader's own call to the API: the
+   * strings in the language of the page it is on, and the release the notes below were rendered
+   * from. One file serves every locale because everything locale-shaped is here.
+   */
+  const config = {
+    rowHeight: ROW,
+    latestId: latest.id,
+    latestAt: latest.published_at,
+    dateLocale: t.dateLocale,
+    prerelease: t.prerelease,
+    downloadsLabel: t.downloadsLabel,
+    newRelease: t.newRelease
+  }
+  return `<section id="releases" class="panel section" aria-labelledby="releases-heading" data-live-config="${escape(JSON.stringify(config))}">
 <h2 id="releases-heading">${escape(t.releases)}</h2>
 <article class="release release-latest prose">
 <h3>${head(latest)} <span class="release-date">${escape(day(latest.published_at, t))}</span></h3>
@@ -609,6 +631,7 @@ ${barChart(rows, t)}
 <p class="chart-note">${escape(t.downloadsNote)}</p>
 </div>
 <p class="more"><a href="${RELEASES}">${escape(t.allReleases)}</a></p>
+<script src="${escape(linkTo(landingOut(t), "live.js"))}" defer></script>
 </section>`
 }
 

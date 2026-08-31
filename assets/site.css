@@ -815,6 +815,20 @@ details.release[open] > summary {
   font-weight: 600;
 }
 
+/*
+ * Only assets/live.js ever puts this on the page, and only when GitHub has a release the build did
+ * not: the notes below it are the ones this page was built with, and this line says where the newer
+ * ones are. Its own rule above the card rather than a colour, since colour alone says nothing.
+ */
+.live-banner {
+  margin: 0 0 1rem;
+  padding: 0.7rem 1.3rem;
+  border: 1px solid var(--vsl);
+  border-radius: 8px;
+  background: rgba(126, 80, 30, 0.25);
+  font-weight: 600;
+}
+
 /* ------------------------------------------------------------- downloads */
 
 /*
