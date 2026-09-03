@@ -4,7 +4,7 @@
  * The page is complete before this runs: the bars, the notes and the dates are all built from the
  * same API, read when the site was last built. This repeats that one call from the reader's browser
  * and refreshes what has moved since, which is the counts and, when a release was published after
- * the last build, the header of the newest one.
+ * the last build, a banner pointing at it; the built card itself is never relabeled.
  *
  * Anything unexpected, a blocked request, a rate limit, an answer that is not the shape it should
  * be, leaves the built section exactly as it stands and says nothing to the reader. There is no
@@ -106,22 +106,10 @@
 
     var latest = list[0]
     var card = section.querySelector(".release-latest")
-    var head = card && card.querySelector("h3")
-    if (head && latest.id !== cfg.latestId) {
-      head.querySelector(".release-tag").textContent = latest.tag_name
-      var date = head.querySelector(".release-date")
-      date.textContent = day(latest.published_at)
-      var chip = head.querySelector(".chip")
-      if (latest.prerelease && !chip) {
-        chip = document.createElement("span")
-        chip.className = "chip"
-        chip.textContent = cfg.prerelease
-        head.insertBefore(chip, date)
-        head.insertBefore(document.createTextNode(" "), date)
-      } else if (!latest.prerelease && chip) {
-        chip.remove()
-      }
-    }
+    // The card's header is never rewritten: its tag and date belong to the notes the build rendered
+    // under it, and relabeling them with a newer release's name would caption one version's notes
+    // with another version's number. A newer release announces itself through the banner alone,
+    // until the next build renders it properly.
 
     /*
      * The notes under that header are still the ones the build rendered, and turning markdown into
