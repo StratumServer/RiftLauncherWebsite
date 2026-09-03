@@ -22,5 +22,21 @@
       "windows": 270,
       "linux": 66
     }
+  },
+  {
+    "date": "2026-09-03",
+    "total": 332,
+    "perRelease": {
+      "v1.7.0-beta.6": 78,
+      "v1.7.0-beta.5": 53,
+      "v1.7.0-beta.4": 76,
+      "v1.7.0-beta.3": 78,
+      "v1.7.0-beta.2": 37,
+      "v1.7.0-beta.1": 10
+    },
+    "feed": {
+      "windows": 204,
+      "linux": 69
+    }
   }
 ]
