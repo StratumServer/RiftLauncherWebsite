@@ -4,11 +4,16 @@ on:
   push:
     branches: [main]
   # Kept as a hook: anything holding a token with Actions access to this repository can dispatch
-  # this event to trigger a rebuild. Nothing sends it today; docs merges reach the site through a
-  # manual run instead.
+  # this event to trigger a rebuild. Nothing sends it today.
   repository_dispatch:
     types: [source-updated]
   workflow_dispatch:
+  # Releases and their notes are read from the GitHub API at build time, so a release published
+  # over on RiftLauncher only reaches this page when something rebuilds it. Nothing did between
+  # 4 and 8 September 2026, and two betas showed up as "read the notes on GitHub". Four builds a
+  # day bound that gap to six hours; the download history still keeps one point per day.
+  schedule:
+    - cron: "0 */6 * * *"
 
 permissions:
   # The build records one download total a day into data/downloads-history.json and pushes it back,
