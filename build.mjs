@@ -661,6 +661,23 @@ ${barChart(rows, t)}
 
 // ---------------------------------------------------------------- landing
 
+/*
+ * Screenshots of the launcher itself, in the order the section shows them. The files sit in
+ * assets/shots and reach the output at /shots like everything else in that folder, so a new set
+ * is a file swap plus its caption in every locale. Each entry pairs with the locale's `shots`
+ * list at the same index: alt text first, then the caption under the picture.
+ */
+const SHOTS = ["01-home", "12-installations", "02-mods-browse", "05-manage-mods-selection", "07-detail-panel", "10-accent-teal"]
+
+/** The gallery, one figure per screenshot. Sizes are on the tags so nothing reflows as they load. */
+const gallery = (out, t) => `<section id="shots" class="panel section" aria-labelledby="shots-heading">
+<h2 id="shots-heading">${escape(t.screenshots)}</h2>
+<ul class="shots">${SHOTS.map((name, i) => {
+  const [alt, caption] = t.shots[i]
+  return `<li><figure class="shot"><img src="${escape(linkTo(out, `shots/${name}.webp`))}" alt="${escape(alt)}" width="1280" height="720" loading="lazy"><figcaption>${escape(caption)}</figcaption></figure></li>`
+}).join("")}</ul>
+</section>`
+
 /**
  * One landing per locale. Every path here is worked out from the page's own depth, so the French
  * page at fr/index.html reaches the same assets one level up without a base path anywhere.
@@ -685,6 +702,7 @@ ${t.docsNote ? `<p class="docs-note">${escape(t.docsNote)}</p>\n` : ""}<p class=
     .map(([icon, title, text]) => `<li class="feature">${ICON[icon]}<h3>${escape(title)}</h3><p>${escape(text)}</p></li>`)
     .join("")}</ul>
 </section>
+${gallery(out, t)}
 ${releasesSection(t)}
 </main>`
   return shell({ out, title: t.title, description: t.description, body, wide: true, t, localized: true })
@@ -711,7 +729,7 @@ for (const page of pages.values()) {
 
 for (const locale of LOCALES) {
   write(landingOut(locale), landing(locale))
-  anchorsByPage.set(landingOut(locale), new Set(["main", "features", ...(releases ? ["releases"] : [])]))
+  anchorsByPage.set(landingOut(locale), new Set(["main", "features", "shots", ...(releases ? ["releases"] : [])]))
 }
 
 cpSync(join(ROOT, "assets"), OUT, { recursive: true })

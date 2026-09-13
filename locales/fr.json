@@ -74,6 +74,33 @@
       "Choisissez le fond du launcher dans le catalogue de scènes, ou mettez une image à vous."
     ]
   ],
+  "screenshots": "À quoi ça ressemble",
+  "shots": [
+    [
+      "La page d'accueil du launcher, avec une installation choisie et prête à lancer",
+      "L'accueil, avec la dernière installation utilisée."
+    ],
+    [
+      "Une liste de trois installations, chacune avec sa version du jeu et son nombre de mods",
+      "Trois installations, chacune sur sa version."
+    ],
+    [
+      "Le navigateur de mods, avec une grille de cartes de mods venues du ModDB",
+      "Parcourez le ModDB sans quitter le launcher."
+    ],
+    [
+      "La liste des mods installés, deux mods cochés et une rangée d'actions au-dessus",
+      "Cochez des mods et agissez sur tous d'un coup."
+    ],
+    [
+      "Le panneau de détail d'un mod, ouvert à côté de la liste des mods installés",
+      "Le détail d'un mod, à côté de la liste."
+    ],
+    [
+      "La page d'accueil à nouveau, avec la couleur d'accent sarcelle",
+      "Ambre ou sarcelle, comme vous préférez."
+    ]
+  ],
   "releases": "Versions publiées",
   "prerelease": "bêta",
   "allReleases": "Toutes les versions sur GitHub",

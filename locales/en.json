@@ -50,6 +50,16 @@
     ["scene", "Make it yours", "Set the launcher's background from the catalog of scenes, or from an image of your own."]
   ],
 
+  "screenshots": "What it looks like",
+  "shots": [
+    ["The launcher's home page, with one installation picked and ready to play", "Home, with the installation you played last."],
+    ["A list of three installations, each showing its game version and how many mods it has", "Three installations, each on its own version."],
+    ["The mod browser, showing a grid of mod cards read from the ModDB", "Browse the ModDB without leaving the launcher."],
+    ["The installed mods list with two mods ticked and a row of actions above them", "Tick mods and act on them together."],
+    ["A mod's detail panel, open beside the installed mods list", "A mod's details, beside the list."],
+    ["The home page again, with the teal accent colour applied", "Amber or teal, whichever you prefer."]
+  ],
+
   "releases": "Releases",
   "prerelease": "beta",
   "allReleases": "All releases on GitHub",

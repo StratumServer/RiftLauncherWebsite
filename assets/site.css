@@ -744,6 +744,45 @@ code {
   color: var(--text);
 }
 
+/* Screenshots: two side by side where there is room, one column below that. Same card treatment
+   as the features above them, so the section reads as part of the same run of panels. */
+.shots {
+  list-style: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 52rem) {
+  .shots {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.shot {
+  margin: 0;
+  padding: 0.6rem;
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  background: rgba(9, 9, 11, 0.55);
+}
+
+/* The width and height on the tag hold the space while the file loads, so nothing below jumps. */
+.shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+.shot figcaption {
+  margin: 0.65rem 0.3rem 0.15rem;
+  font-size: 0.93rem;
+  color: var(--text);
+}
+
 
 .release {
   margin: 0 0 1rem;
