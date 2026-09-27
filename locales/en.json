@@ -44,20 +44,54 @@
     [
       "moddb",
       "Mods without leaving the launcher",
-      "Browse the ModDB, install and update, search what is already installed, and hold a mod back so Update all skips it."
+      "Browse the ModDB, install and update, search what is already installed, hold a mod back so Update all skips it, and get suggestions for an installation if you turn them on."
     ],
-    ["accounts", "Your accounts", "Keep several Vintage Story accounts saved and switch between them. In the next release."],
+    [
+      "health",
+      "A check before you play",
+      "Manage Mods lists what will stop the game loading, such as a missing dependency, and flags a mod installed twice, each with the action that fixes it."
+    ],
+    [
+      "servers",
+      "Servers, one click away",
+      "Save a server's address on an installation, then join it from the launcher. A modpack can carry the bookmark to whoever you share it with."
+    ],
+    [
+      "sessions",
+      "After each session",
+      "When the game closes, read a report built from its logs, with errors and warnings grouped under the mod they name, and look back at memory and CPU over your recent sessions."
+    ],
+    ["accounts", "Your accounts", "Keep several Vintage Story accounts saved and switch between them."],
     ["scene", "Make it yours", "Set the launcher's background from the catalog of scenes, or from an image of your own."]
   ],
 
   "screenshots": "What it looks like",
   "shots": [
     ["The launcher's home page, with one installation picked and ready to play", "Home, with the installation you played last."],
-    ["A list of three installations, each showing its game version and how many mods it has", "Three installations, each on its own version."],
-    ["The mod browser, showing a grid of mod cards read from the ModDB", "Browse the ModDB without leaving the launcher."],
+    [
+      "A list of three installations, each showing its game version, when it was last played and how many mods it has",
+      "Three installations, each on its own version."
+    ],
+    ["The servers saved on one installation, each with its address and a Join button", "Servers saved on an installation, one click from joining."],
+    [
+      "The mod browser, with a row of mods suggested for the selected installation above the ModDB catalog",
+      "Browse the ModDB, with suggestions if you turn them on."
+    ],
     ["The installed mods list with two mods ticked and a row of actions above them", "Tick mods and act on them together."],
+    [
+      "The installation check above the installed mods, listing a missing dependency and a mod installed twice, each with a button to fix it",
+      "What will stop the game loading, and the fix for each."
+    ],
     ["A mod's detail panel, open beside the installed mods list", "A mod's details, beside the list."],
-    ["The home page again, with the teal accent colour applied", "Amber or teal, whichever you prefer."]
+    [
+      "A session report: the verdict at the top, then each mod's errors and warnings from the game's log",
+      "After a session, the game's log sorted by mod."
+    ],
+    [
+      "A chart of one play session's memory and CPU over time, with a note that memory only went up",
+      "Memory and CPU for a session, after the fact."
+    ],
+    ["The home page again, with the teal accent colour applied", "Amber by default, teal here, six more to pick from."]
   ],
 
   "releases": "Releases",

@@ -9,10 +9,12 @@ rendered documentation. Published at
 Nothing in this repository is a copy of the launcher's documentation. `build.mjs` reads the `docs/`
 tree and `PRIVACY.md` from the launcher's `dev` branch, and the background scenes from its
 `backgrounds` branch, both fetched fresh on every run. `docs/SUMMARY.md` alone decides the sidebar,
-so adding a page there is all it takes to see it here. Nothing rebuilds on a schedule. The site
-builds on a push to this repository or on a manual run of the Pages workflow (Actions, Run
-workflow), which is what a documentation merge in the launcher repository needs to reach the
-published pages. Release data does not need a rebuild at all: the reader's browser fetches it.
+so adding a page there is all it takes to see it here. The site builds on a push to this
+repository, on a manual run of the Pages workflow (Actions, Run workflow), which is what a
+documentation merge in the launcher repository needs to reach the published pages, and every six
+hours on a schedule, which is how a new release and its notes reach the landing page with nobody
+touching this repository. Until that run, the reader's browser already sees the newer release and
+links its notes on GitHub.
 
 The landing page's releases section is built from the GitHub API, and `assets/live.js` makes that
 same call again from the reader's browser to refresh the download counts on the page. What the build
