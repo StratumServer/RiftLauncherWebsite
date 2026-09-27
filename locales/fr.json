@@ -66,7 +66,7 @@
     [
       "health",
       "Une vérification avant de jouer",
-      "« Gérer les mods » liste ce qui empêchera le jeu de charger, comme une dépendance manquante ou un même mod installé deux fois, avec pour chaque problème l'action qui le règle."
+      "« Gérer les mods » liste ce qui empêchera le jeu de charger, comme une dépendance manquante, et signale un mod installé deux fois, avec l'action qui règle chaque cas."
     ],
     [
       "servers",

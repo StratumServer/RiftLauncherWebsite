@@ -49,7 +49,7 @@
     [
       "health",
       "A check before you play",
-      "Manage Mods lists what will stop the game loading, such as a missing dependency or the same mod installed twice, each with the action that fixes it."
+      "Manage Mods lists what will stop the game loading, such as a missing dependency, and flags a mod installed twice, each with the action that fixes it."
     ],
     [
       "servers",
