@@ -31,7 +31,10 @@ one total a day in `data/downloads-history.json` and commits it back. The bar ch
 today's snapshot; the curve above it appears on its own once that file holds a week of points.
 
 The only other things this repository holds are the build script, the stylesheet, the script that
-refreshes the counts, and the landing page copy.
+refreshes the counts, the landing page copy, the launcher screenshots in `assets/shots`, the animated
+clips recorded for the ModDB page in `assets/moddb` (the landing reuses them), and a 320px copy of
+the emblem in `assets/emblem.webp`, since the branding PNG is over a megabyte and only serves as the
+preview card image.
 
 ## Languages
 
@@ -47,8 +50,10 @@ which lists every language by its own name and grows as files are added.
 2. Translate every value. `name` is the language's name in that language, since that is what the
    header lists it as, and `short` is the code shown on the button. `dateLocale` is the tag release
    dates are formatted with, `fr-FR` style. A few strings carry `{name}` holes that are filled with
-   numbers and dates at build time; they have to survive the translation. Say in `docsNote`, in the
-   language you are adding, that the documentation is in English.
+   numbers and dates at build time; they have to survive the translation. Strings written like
+   `{privacy:privacy policy}` are links: keep the key before the colon as it is and translate the
+   label after it. Say in `docsNote`, in the language you are adding, that the documentation is in
+   English.
 3. Add the code to the `LOCALES` list at the top of `build.mjs`, then `npm run build` and open a
    pull request. The build writes the new landing, adds it to every other language's `hreflang` list
    and to the header, and fails if anything it points at does not resolve.
@@ -92,6 +97,15 @@ asset at the wrong depth: their links, their stylesheet, icon and background pat
 `hreflang` addresses they point at each other with all have to resolve to a file the build produced.
 
 ## Design notes
+
+The landing follows the ModDB page: a hero with the launcher beside the copy, then numbered sections
+(the VS Launcher story, the animated clips, the features, screenshots, privacy and trust, install
+per system, releases, help), each a dark translucent panel with the amber rule on top. The download
+button points at the newest release page and, on Windows or a Linux desktop, straight at that
+system's installer; the install section lists every file of that release with its size. Motion is
+CSS only (embers, the floating emblem, scroll reveals, the progress line under the bar) and all of it
+stops under `prefers-reduced-motion`, where the animated clips are also swapped for still screenshots.
+First visits open on the Lava Springs scene, the one the ModDB page uses.
 
 The site borrows the launcher's own surface: a background scene from the shared catalog, near-black
 scrims over it, and the same `#7e501e` / `#d49754` / `#4f3110` brand ramp. Text never sits on the
