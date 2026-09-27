@@ -61,12 +61,27 @@
     [
       "moddb",
       "Les mods sans quitter le launcher",
-      "Parcourez le ModDB, installez et mettez à jour, cherchez parmi ce qui est déjà installé, et bloquez un mod pour que « Tout mettre à jour » le laisse de côté."
+      "Parcourez le ModDB, installez et mettez à jour, cherchez parmi ce qui est déjà installé, bloquez un mod pour que « Tout mettre à jour » le laisse de côté, et recevez des suggestions pour une installation si vous les activez."
+    ],
+    [
+      "health",
+      "Une vérification avant de jouer",
+      "« Gérer les mods » liste ce qui empêchera le jeu de charger, comme une dépendance manquante ou un même mod installé deux fois, avec pour chaque problème l'action qui le règle."
+    ],
+    [
+      "servers",
+      "Vos serveurs à un clic",
+      "Enregistrez l'adresse d'un serveur sur une installation, puis rejoignez-le depuis le launcher. Un modpack peut emporter ce favori chez ceux avec qui vous le partagez."
+    ],
+    [
+      "sessions",
+      "Après chaque session",
+      "Quand le jeu se ferme, lisez un rapport tiré de ses journaux, avec les erreurs et avertissements rangés sous le mod qu'ils nomment, et revoyez la mémoire et le processeur de vos dernières sessions."
     ],
     [
       "accounts",
       "Vos comptes",
-      "Gardez plusieurs comptes Vintage Story enregistrés et passez de l'un à l'autre. Dans la prochaine version."
+      "Gardez plusieurs comptes Vintage Story enregistrés et passez de l'un à l'autre."
     ],
     [
       "scene",
@@ -81,24 +96,40 @@
       "L'accueil, avec la dernière installation utilisée."
     ],
     [
-      "Une liste de trois installations, chacune avec sa version du jeu et son nombre de mods",
+      "Une liste de trois installations, chacune avec sa version du jeu, sa dernière partie et son nombre de mods",
       "Trois installations, chacune sur sa version."
     ],
     [
-      "Le navigateur de mods, avec une grille de cartes de mods venues du ModDB",
-      "Parcourez le ModDB sans quitter le launcher."
+      "Les serveurs enregistrés sur une installation, chacun avec son adresse et un bouton Rejoindre",
+      "Les serveurs d'une installation, à un clic de la partie."
+    ],
+    [
+      "Le navigateur de mods, avec une rangée de mods suggérés pour l'installation choisie au-dessus du catalogue du ModDB",
+      "Parcourez le ModDB, avec des suggestions si vous les activez."
     ],
     [
       "La liste des mods installés, deux mods cochés et une rangée d'actions au-dessus",
       "Cochez des mods et agissez sur tous d'un coup."
     ],
     [
+      "La vérification de l'installation au-dessus des mods installés, avec une dépendance manquante et un mod installé deux fois, chacun avec un bouton pour corriger",
+      "Ce qui empêchera le jeu de charger, et comment le corriger."
+    ],
+    [
       "Le panneau de détail d'un mod, ouvert à côté de la liste des mods installés",
       "Le détail d'un mod, à côté de la liste."
     ],
     [
+      "Un rapport de session : le verdict en haut, puis les erreurs et avertissements de chaque mod tirés du journal du jeu",
+      "Après une session, le journal du jeu trié par mod."
+    ],
+    [
+      "Le graphique de la mémoire et du processeur d'une session de jeu dans le temps, avec une note disant que la mémoire n'a fait que monter",
+      "La mémoire et le processeur d'une session, après coup."
+    ],
+    [
       "La page d'accueil à nouveau, avec la couleur d'accent sarcelle",
-      "Ambre ou sarcelle, comme vous préférez."
+      "Ambre par défaut, sarcelle ici, et six autres au choix."
     ]
   ],
   "releases": "Versions publiées",
