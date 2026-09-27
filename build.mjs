@@ -539,6 +539,7 @@ function notes(markdown) {
       return `<h${demoted}>${inner}</h${demoted}>`
     })
     .replace(/\s(href|src)="([^"]*)"/g, (_, attribute, value) => ` ${attribute}="${escape(/^(?:[a-z]+:|\/\/)/i.test(value) ? value : REPO)}"`)
+    .replace(/<table>/g, '<div class="table-scroll"><table>').replace(/<\/table>/g, "</table></div>")
 }
 
 /*
