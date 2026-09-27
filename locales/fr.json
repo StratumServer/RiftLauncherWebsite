@@ -2,123 +2,119 @@
   "name": "Français",
   "short": "FR",
   "dateLocale": "fr-FR",
+
   "title": "RiftLauncher",
   "description": "RiftLauncher est un launcher indépendant pour Vintage Story. Installez plusieurs versions, gardez des installations séparées avec leurs propres mods, mondes et configurations, et faites des sauvegardes.",
+
   "skip": "Aller au contenu",
   "docsLink": "Docs",
   "scene": "Arrière-plan",
   "changeLanguage": "Changer de langue",
+  "navLabel": "Sections",
+  "navAbout": "Le projet",
+  "navFeatures": "Fonctions",
+  "navInstall": "Installer",
+  "navReleases": "Versions",
+  "navHelp": "Aide",
+
   "kicker": "Un launcher pour Vintage Story",
   "headline": "Toutes les versions de Vintage Story, côte à côte.",
   "lead": "Gardez autant d'installations que vous voulez, chacune avec ses propres mods, mondes et configurations, faites des sauvegardes manuelles ou automatiques avant que quelque chose ne casse, et parcourez le ModDB sans quitter le launcher.",
+  "heroChips": ["Libre et gratuit (MIT)", "Windows et Linux", "14 langues"],
+
   "download": "Télécharger",
   "downloadFor": "Télécharger pour ",
   "windows": "Windows",
   "linux": "Linux",
   "docs": "Consulter la documentation",
   "seeFeatures": "Voir ce qu'il fait",
+  "releaseLine": "{tag}, publiée le {date}.",
+  "otherFiles": "Autres systèmes et fichiers",
   "docsNote": "La documentation est en anglais.",
   "beta": "Préversion bêta : attendez-vous à des aspérités. Sauvegardez vos mondes d'abord.",
-  "platforms": [
-    [
-      "Windows",
-      "riftlauncher-X.X.X-setup.exe"
-    ],
-    [
-      "AppImage Linux",
-      "riftlauncher-X.X.X.AppImage"
-    ],
-    [
-      "Debian et Ubuntu",
-      ".deb"
-    ],
-    [
-      "Fedora et RHEL",
-      ".rpm"
-    ],
-    [
-      "Arch",
-      ".pacman"
-    ]
+
+  "aboutEyebrow": "Le projet",
+  "aboutTitle": "La suite de VS Launcher",
+  "lineage": ["par XurxoMF, archivé", "par Stratum, maintenu"],
+  "about": [
+    "RiftLauncher est construit sur {vsLauncher:VS Launcher} de {xurxo:XurxoMF}, et prend le relais maintenant que l'original est archivé.",
+    "Il est fait par l'équipe {stratum:Stratum}, avec un cœur reconstruit et testé sous Windows et Linux.",
+    "Merci à XurxoMF et à toutes les personnes qui ont codé, traduit et testé l'original. La {contributors:page des contributeurs} les nomme."
   ],
-  "features": "Ce qu'il fait",
-  "cards": [
+
+  "motionEyebrow": "En mouvement",
+  "motionTitle": "Le launcher à l'œuvre",
+  "motionIntro": "Enregistré sur la 1.7.0-beta.11 sous Linux, avec des installations et des mods inventés. Les résultats du ModDB sont les vrais.",
+  "clips": [
     [
-      "versions",
-      "Les versions côte à côte",
-      "Installez autant de versions du jeu que vous voulez, et choisissez celle que chaque installation utilise."
+      "Navigateur de mods",
+      "Le ModDB, dans le launcher",
+      "Cherchez dans le ModDB avec des filtres, Auteur compris, et installez depuis la carte : sa couleur montre si une version convient.",
+      "Cochez plusieurs mods pour les installer ensemble, et activez si vous le voulez les suggestions de mods compatibles, chacune avec sa raison.",
+      "Un auteur tapé dans le filtre de la page Mods, puis le défilement de ses mods sur le ModDB"
     ],
     [
-      "installations",
-      "Des installations bien séparées",
-      "Chaque installation garde ses propres mods, mondes et configurations : ce que vous faites dans l'une ne touche pas aux autres."
+      "Gérer les mods",
+      "Agir sur toute une sélection",
+      "Activez, désactivez ou mettez à jour tous les mods cochés d'un coup, cherchez parmi ce qui est déjà installé, et bloquez un mod pour que « Tout mettre à jour » le laisse de côté.",
+      "Des profils, un panneau de détail, et les mods envoyés par un serveur, rangés sous ce serveur.",
+      "Trois mods installés cochés, et les actions de la sélection qui apparaissent au-dessus de la liste"
     ],
     [
-      "backup",
-      "Les sauvegardes",
-      "Faites une sauvegarde à la main quand vous voulez, ou laissez le launcher en prendre une automatiquement avant de jouer."
+      "Vérification de l'installation",
+      "Ce qui empêchera le jeu de charger",
+      "« Gérer les mods » liste ce qui empêcherait le jeu de charger, comme une dépendance manquante ou le même mod installé deux fois.",
+      "La correction se fait au même endroit : installer le mod manquant, ou supprimer la copie en trop.",
+      "La vérification de l'installation qui s'ouvre sur une dépendance manquante et un mod installé deux fois"
     ],
     [
-      "moddb",
-      "Les mods sans quitter le launcher",
-      "Parcourez le ModDB, installez et mettez à jour, cherchez parmi ce qui est déjà installé, bloquez un mod pour que « Tout mettre à jour » le laisse de côté, et recevez des suggestions pour une installation si vous les activez."
+      "Sessions de jeu",
+      "Après la partie, les chiffres",
+      "Quand le jeu se ferme, lisez un rapport tiré de ses journaux, avec les erreurs et avertissements rangés sous le mod qu'ils nomment. « Copier le rapport » masque les chemins et les informations de compte.",
+      "La mémoire et le processeur de vos dernières sessions, après coup. Une notification de plantage ouvre le rapport.",
+      "Une session de jeu enregistrée qu'on ouvre pour voir sa courbe de mémoire et de processeur"
     ],
     [
-      "health",
-      "Une vérification avant de jouer",
-      "« Gérer les mods » liste ce qui empêchera le jeu de charger, comme une dépendance manquante, et signale un mod installé deux fois, avec l'action qui règle chaque cas."
-    ],
-    [
-      "servers",
-      "Vos serveurs à un clic",
-      "Enregistrez l'adresse d'un serveur sur une installation, puis rejoignez-le depuis le launcher. Un modpack peut emporter ce favori chez ceux avec qui vous le partagez."
-    ],
-    [
-      "sessions",
-      "Après chaque session",
-      "Quand le jeu se ferme, lisez un rapport tiré de ses journaux, avec les erreurs et avertissements rangés sous le mod qu'ils nomment, et revoyez la mémoire et le processeur de vos dernières sessions."
-    ],
-    [
-      "accounts",
-      "Vos comptes",
-      "Gardez plusieurs comptes Vintage Story enregistrés et passez de l'un à l'autre."
-    ],
-    [
-      "scene",
+      "Apparence et langues",
       "À votre goût",
-      "Choisissez le fond du launcher dans le catalogue de scènes, ou mettez une image à vous."
+      "Huit couleurs d'accent, et un fond choisi dans le catalogue de scènes ou une image à vous. La scène derrière cette page en fait partie.",
+      "14 langues, le biélorusse en dernier, traduites sur {weblate:Weblate}.",
+      "Le fond qui passe à Lava Springs, puis le tour des couleurs d'accent"
     ]
   ],
-  "screenshots": "À quoi ça ressemble",
+
+  "featuresEyebrow": "Fonctions",
+  "features": "Tout le reste, dans un seul launcher",
+  "featuresIntro": "Une ligne ou deux par domaine. La documentation va plus loin.",
+  "cards": [
+    ["versions", "Les versions côte à côte", "Installez n'importe quelle version officielle en un clic, ou enregistrez un dossier du jeu que vous avez déjà. Deux builds de la même version ont chacune un nom, modifiable ensuite."],
+    ["installations", "Des installations bien séparées", "Chaque installation choisit sa version et garde ses propres mods, mondes, réglages et variables d'environnement : ce que vous faites dans l'une ne touche pas aux autres."],
+    ["backup", "Les sauvegardes", "Faites une sauvegarde à la main quand vous voulez, ou laissez le launcher en prendre une avant chaque partie, avec une limite que vous fixez."],
+    ["modpack", "Les modpacks", "Exportez les mods d'une installation dans un fichier .json, et importez-en un pour tous les installer d'un coup."],
+    ["servers", "Vos serveurs à un clic", "Enregistrez l'adresse d'un serveur sur une installation, et « Rejoindre » lance le jeu déjà tourné vers lui. Un modpack peut emporter ce favori chez ceux avec qui vous le partagez."],
+    ["accounts", "Vos comptes", "Gardez plusieurs comptes Vintage Story enregistrés et passez de l'un à l'autre. Pas de trousseau système ? La connexion marche quand même, et aussi derrière un proxy."]
+  ],
+
+  "shotsEyebrow": "Captures",
+  "screenshots": "De plus près",
+  "shotsIntro": "Prises sur la 1.7.0-beta.11, sous Linux.",
   "shots": [
-    [
-      "La page d'accueil du launcher, avec une installation choisie et prête à lancer",
-      "L'accueil, avec la dernière installation utilisée."
-    ],
+    ["La page d'accueil du launcher, avec une installation choisie et prête à lancer", "L'accueil, avec la dernière installation utilisée."],
     [
       "Une liste de trois installations, chacune avec sa version du jeu, sa dernière partie et son nombre de mods",
       "Trois installations, chacune sur sa version."
     ],
-    [
-      "Les serveurs enregistrés sur une installation, chacun avec son adresse et un bouton Rejoindre",
-      "Les serveurs d'une installation, à un clic de la partie."
-    ],
+    ["Les serveurs enregistrés sur une installation, chacun avec son adresse et un bouton Rejoindre", "Les serveurs d'une installation, à un clic de la partie."],
     [
       "Le navigateur de mods, avec une rangée de mods suggérés pour l'installation choisie au-dessus du catalogue du ModDB",
       "Parcourez le ModDB, avec des suggestions si vous les activez."
     ],
-    [
-      "La liste des mods installés, deux mods cochés et une rangée d'actions au-dessus",
-      "Cochez des mods et agissez sur tous d'un coup."
-    ],
+    ["La liste des mods installés, deux mods cochés et une rangée d'actions au-dessus", "Cochez des mods et agissez sur tous d'un coup."],
     [
       "La vérification de l'installation au-dessus des mods installés, avec une dépendance manquante et un mod installé deux fois, chacun avec un bouton pour corriger",
       "Ce qui empêchera le jeu de charger, et comment le corriger."
     ],
-    [
-      "Le panneau de détail d'un mod, ouvert à côté de la liste des mods installés",
-      "Le détail d'un mod, à côté de la liste."
-    ],
+    ["Le panneau de détail d'un mod, ouvert à côté de la liste des mods installés", "Le détail d'un mod, à côté de la liste."],
     [
       "Un rapport de session : le verdict en haut, puis les erreurs et avertissements de chaque mod tirés du journal du jeu",
       "Après une session, le journal du jeu trié par mod."
@@ -127,12 +123,47 @@
       "Le graphique de la mémoire et du processeur d'une session de jeu dans le temps, avec une note disant que la mémoire n'a fait que monter",
       "La mémoire et le processeur d'une session, après coup."
     ],
+    ["La page d'accueil à nouveau, avec la couleur d'accent sarcelle", "Ambre par défaut, sarcelle ici, et six autres au choix."]
+  ],
+
+  "trustEyebrow": "Vie privée et confiance",
+  "trustTitle": "Construit au grand jour",
+  "trust": [
+    ["privacy", "Aucune télémétrie", "La {privacy:politique de confidentialité} liste chaque requête que le launcher peut faire, et elle est fournie avec lui sous « Infos et aide ».", "Les journaux et rapports partagés masquent vos chemins de dossiers et vos informations de compte."],
+    ["health", "Compté seulement avec votre accord", "Le launcher peut compter votre installation sur sa page du ModDB, et il demande d'abord.", "Il pose la question une fois par version, et vous pouvez répondre pour de bon dans un sens comme dans l'autre."],
+    ["checked", "Des versions vérifiables", "Chaque installateur est construit par une CI publique à partir d'un commit tagué.", "Chaque version publiée donne les sommes SHA-256 et les résultats VirusTotal."],
+    ["review", "Relu en public", "Chaque changement passe par une {prs:pull request} relue et des milliers de tests automatisés.", "Les bugs sont suivis au grand jour sur le {issues:gestionnaire de tickets}."]
+  ],
+
+  "installEyebrow": "Installer",
+  "installTitle": "Pour commencer",
+  "installIntro": "Les fichiers ci-dessous viennent de la version la plus récente, et toutes les précédentes sont sur la {releases:page des versions GitHub}. RiftLauncher est un launcher, pas un mod : ne le mettez jamais dans votre dossier Mods.",
+  "installWindows": "Lancez le setup .exe. Il n'est pas encore signé, donc SmartScreen peut avertir : les sommes de contrôle et les analyses sont sur la version publiée. Vintage Story demande .NET 7, 8 ou 10 selon la version.",
+  "installLinux": "L'AppImage tourne sur n'importe quelle distribution, et les paquets .deb, .rpm et .pacman s'installent comme n'importe quelle appli. La mise à jour intégrée gère chacun d'eux.",
+  "installMac": "Pas encore de build. Suivez les {releases:versions publiées} pour savoir quand ça change.",
+  "guideWindows": "Guide Windows",
+  "guideLinux": "Guide Linux",
+  "guideMac": "À propos de macOS",
+  "fileLabels": {
+    "windows": "Installateur Windows",
+    "appimage": "AppImage, toute distribution",
+    "deb": "Debian et Ubuntu",
+    "rpm": "Fedora et RHEL",
+    "pacman": "Arch"
+  },
+  "installNotes": [
     [
-      "La page d'accueil à nouveau, avec la couleur d'accent sarcelle",
-      "Ambre par défaut, sarcelle ici, et six autres au choix."
+      "Vous venez de VS Launcher",
+      "Au premier lancement, RiftLauncher copie vos réglages de VS Launcher dans son propre dossier, et vos installations apparaissent tout de suite. Votre compte suit en général aussi ; sinon, vous vous connectez une fois. Rien n'est déplacé ni supprimé du côté de VS Launcher."
+    ],
+    [
+      "Rester à jour",
+      "Le launcher vérifie ses propres mises à jour et demande avant d'en télécharger une. Les bêtas s'activent dans Configuration, Versions bêta, et les nouveautés s'affichent après une mise à jour."
     ]
   ],
+
   "releases": "Versions publiées",
+  "releasesTitle": "Les derniers changements",
   "prerelease": "bêta",
   "allReleases": "Toutes les versions sur GitHub",
   "downloads": "Téléchargements par version",
@@ -141,6 +172,17 @@
   "downloadsLabel": "Téléchargements par version. {rows}.",
   "overTime": "Téléchargements dans le temps",
   "overTimeNote": "De {firstTotal} le {firstDate} à {lastTotal} le {lastDate}, relevé une fois par jour.",
+
+  "helpEyebrow": "Aide",
+  "helpTitle": "Questions, bugs, traductions",
+  "help": [
+    ["discord", "Demander de l'aide", "Sur le {discord:Discord de Stratum}."],
+    ["github", "Signaler un bug", "Sur les {issues:tickets GitHub}, avec votre version et votre système."],
+    ["docs", "Lire les guides", "Les guides d'installation et d'utilisation sont dans la {docs:documentation}, en anglais."],
+    ["globe", "Traduire", "Donnez un coup de main sur {weblate:Weblate} avec un compte GitHub."]
+  ],
+  "support": "Soutenez Zaldaryon sur {kofi:Ko-fi}, ou l'équipe Stratum sur {opencollective:Open Collective}.",
+
   "privacy": "Politique de confidentialité",
   "unofficial": "RiftLauncher n'est pas officiel et n'est pas affilié à Anego Studios, qui développe {vintageStory}.",
   "fork": "RiftLauncher est un fork de {vsLauncher} par {author}. Tout ce que le launcher fait aujourd'hui a commencé là."

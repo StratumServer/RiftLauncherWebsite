@@ -285,6 +285,12 @@ const ICON = {
   servers: line('<rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01"/><path d="M7 16.5h.01"/><path d="M11 7.5h6"/><path d="M11 16.5h6"/>'),
   sessions: line('<path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/>'),
   accounts: line('<circle cx="9" cy="7.5" r="3.5"/><path d="M2.5 20.5v-1.5a4 4 0 0 1 4-4h5a4 4 0 0 1 4 4v1.5"/><path d="M16.5 4.3a3.5 3.5 0 0 1 0 6.9"/><path d="M18 15.2a4 4 0 0 1 3.5 4v1.3"/>'),
+  windows: line('<rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/>'),
+  linux: line('<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 9l3 3-3 3"/><path d="M12 15h6"/>'),
+  macos: line('<rect x="4" y="4" width="16" height="11" rx="2"/><path d="M2 19h20"/>'),
+  checked: line('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/>'),
+  review: line('<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),
+  modpack: line('<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 13l9 5 9-5"/><path d="M3 17.5l9 5 9-5"/>'),
   github:
     '<svg class="icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>',
   discord:
@@ -294,12 +300,22 @@ const ICON = {
 /** An icon and its word, the word carrying the underline. */
 const iconLink = (href, icon, label) => `<a href="${escape(href)}">${icon}<span>${escape(label)}</span></a>`
 
+/*
+ * The emblem everywhere it is drawn small. The branding PNG in the launcher repository is 1254px
+ * and over a megabyte, which is right for a preview card and far too much for a 30px mark in the
+ * header, so the page uses a 320px copy kept in assets/ and the full file is only the og:image.
+ */
+const EMBLEM = "emblem.webp"
+
 function footer(out, t) {
   const link = (href, text) => `<a href="${href}">${text}</a>`
-  return `<footer class="panel footer">
+  return `<footer class="footer">
+<div class="footer-inner">
+<div class="footer-brand"><img src="${escape(linkTo(out, EMBLEM))}" alt="" width="320" height="320" loading="lazy"><div><strong>RiftLauncher</strong><span>${escape(t.kicker)}</span></div></div>
 <nav class="icon-row" aria-label="Site">${iconLink(REPO, ICON.github, "GitHub")}${iconLink(DISCORD, ICON.discord, "Discord")}${iconLink(MODDB, ICON.moddb, "ModDB")}${iconLink(linkTo(out, "privacy.html"), ICON.privacy, t.privacy)}</nav>
 <p>${fill(escape(t.unofficial), { vintageStory: link("https://www.vintagestory.at", "Vintage Story") })}</p>
 <p>${fill(escape(t.fork), { vsLauncher: link("https://github.com/XurxoMF/vs-launcher", "VS Launcher"), author: link("https://github.com/XurxoMF", "XurxoMF") })}</p>
+</div>
 </footer>`
 }
 
@@ -330,7 +346,20 @@ const alternates = (out) =>
     .map(([code, target]) => `<link rel="alternate" hreflang="${code}" href="${escape(linkTo(out, target))}">`)
     .join("\n")
 
-function shell({ out, title, description, body, wide, t = EN, localized = false }) {
+/*
+ * The scene a first visit opens on. Lava Springs is the one the ModDB page is dressed in, so the two
+ * read as the same place; after that the reader's own pick is kept for the session.
+ */
+const DEFAULT_SCENE = Math.max(
+  catalog.findIndex((scene) => scene.id === "lava-springs"),
+  0
+)
+
+/**
+ * `sections` is the landing's own table of contents, [id, label] pairs shown in the bar where there
+ * is room; the docs pages pass none and keep the bar to the brand and the icons.
+ */
+function shell({ out, title, description, body, wide, t = EN, localized = false, sections = [] }) {
   const home = linkTo(out, localized ? landingOut(t) : "index.html")
   const docs = linkTo(out, "docs/index.html")
   const asset = (name) => escape(linkTo(out, name))
@@ -341,14 +370,17 @@ function shell({ out, title, description, body, wide, t = EN, localized = false 
    * bottom reveals it, so with scripting off there is no control that cannot do anything.
    */
   const picker = `<details class="picker" id="picker" hidden>
-<summary aria-label="${escape(t.scene)}" title="${escape(t.scene)}">${ICON.scene}<span class="picker-name">${escape(catalog[0].name)}</span></summary>
+<summary aria-label="${escape(t.scene)}" title="${escape(t.scene)}">${ICON.scene}<span class="picker-name">${escape(catalog[DEFAULT_SCENE].name)}</span></summary>
 <div class="picker-panel" role="group" aria-label="${escape(t.scene)}">${catalog
     .map(
       (scene, i) =>
-        `<button class="tile" type="button" aria-pressed="${i === 0}"><img src="${escape(linkTo(out, `backgrounds/${scene.thumbnail}`))}" alt="" width="320" height="180" loading="lazy"><span>${escape(scene.name)}</span></button>`
+        `<button class="tile" type="button" aria-pressed="${i === DEFAULT_SCENE}"><img src="${escape(linkTo(out, `backgrounds/${scene.thumbnail}`))}" alt="" width="320" height="180" loading="lazy"><span>${escape(scene.name)}</span></button>`
     )
     .join("")}</div>
 </details>`
+  const sectionNav = sections.length
+    ? `<nav class="sections" aria-label="${escape(t.navLabel)}">${sections.map(([id, label]) => `<a href="#${id}">${escape(label)}</a>`).join("")}</nav>`
+    : ""
   return `<!doctype html>
 <html lang="${t.code}">
 <head>
@@ -356,6 +388,7 @@ function shell({ out, title, description, body, wide, t = EN, localized = false 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escape(title)}</title>
 <meta name="description" content="${escape(description)}">
+<meta name="theme-color" content="#09090b">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="RiftLauncher">
 <meta property="og:title" content="${escape(title)}">
@@ -367,32 +400,66 @@ ${out === "index.html" ? `<meta name="build-sources" content="dev:${SOURCE_REFS.
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="${asset("icon.png")}">
 <link rel="stylesheet" href="${asset("site.css")}">
-<style>.scene{background-image:url("${escape(sceneUrls[0])}")}</style>
+<style>.scene{background-image:url("${escape(sceneUrls[DEFAULT_SCENE])}")}</style>
+<script>document.documentElement.className += " js"</script>
 </head>
 <body>
 <div class="scene" id="scene"></div>
 <div class="scrim"></div>
 <a class="skip" href="#main">${escape(t.skip)}</a>
 <header class="topbar">
-<a class="brand" href="${escape(home)}"><img src="${asset("branding/riftlauncher-full.png")}" alt="" width="1254" height="1254">RiftLauncher</a>
+<a class="brand" href="${escape(home)}"><img src="${asset(EMBLEM)}" alt="" width="320" height="320"><span>RiftLauncher</span></a>
+${sectionNav}
 <div class="topbar-end">
-<nav class="icon-only" aria-label="Main"><a href="${escape(docs)}" aria-label="${escape(t.docsLink)}" title="${escape(t.docsLink)}">${ICON.docs}</a><a href="${RELEASES}/latest" aria-label="${escape(t.download)}" title="${escape(t.download)}">${ICON.download}</a><a href="${REPO}" aria-label="GitHub" title="GitHub">${ICON.github}</a></nav>
+<nav class="icon-only" aria-label="Main"><a href="${escape(docs)}" aria-label="${escape(t.docsLink)}" title="${escape(t.docsLink)}">${ICON.docs}</a><a href="${RELEASES}" aria-label="${escape(t.download)}" title="${escape(t.download)}">${ICON.download}</a><a href="${REPO}" aria-label="GitHub" title="GitHub">${ICON.github}</a></nav>
 ${localized ? languages(out, t) : ""}
 ${picker}
 </div>
+<div class="progress" aria-hidden="true"></div>
 </header>
 <div class="layout${wide ? " layout-wide" : ""}">
 ${body}
 </div>
 ${footer(out, t)}
 <script>
-// One scene per visit, chosen from the launcher's own catalog on the first page and kept for the
-// whole session after that, so moving between pages neither reshuffles the backdrop nor reloads
-// it: the browser serves the same cached file everywhere. Picking a scene in the header keeps it
-// too. The stylesheet already names a default, so a reader with scripting off still gets a
-// background rather than a blank page. This also reveals the header's picker and wires its
-// thumbnails to the scene.
 (function () {
+  // Scroll reveals first, so that nothing below can leave a block hidden: the stylesheet only hides
+  // .reveal under the .js class the head adds, and every block gets .in as it comes into view, or
+  // at once where the browser has no IntersectionObserver.
+  var reveals = document.querySelectorAll(".reveal")
+  var shown = function (el) { el.classList.add("in") }
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return
+        shown(e.target)
+        io.unobserve(e.target)
+      })
+    }, { rootMargin: "0px 0px -6% 0px" })
+    Array.prototype.forEach.call(reveals, function (el) { io.observe(el) })
+
+    // The bar's section links follow the reader down the landing.
+    var links = document.querySelectorAll(".sections a")
+    if (links.length) {
+      var byId = {}
+      Array.prototype.forEach.call(links, function (a) { byId[a.getAttribute("href").slice(1)] = a })
+      var spy = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) return
+          Array.prototype.forEach.call(links, function (a) { a.removeAttribute("aria-current") })
+          byId[e.target.id].setAttribute("aria-current", "location")
+        })
+      }, { rootMargin: "-45% 0px -50% 0px" })
+      Object.keys(byId).forEach(function (id) {
+        var target = document.getElementById(id)
+        if (target) spy.observe(target)
+      })
+    }
+  } else Array.prototype.forEach.call(reveals, shown)
+
+  // One scene per visit, kept for the whole session after that, so moving between pages neither
+  // reshuffles the backdrop nor reloads it. Picking a scene in the header keeps it too. The
+  // stylesheet already names the default, so a reader with scripting off still gets a background.
   var s = ${JSON.stringify(sceneUrls)}
   var names = ${JSON.stringify(catalog.map((scene) => scene.name))}
   var scene = document.getElementById("scene")
@@ -411,7 +478,7 @@ ${footer(out, t)}
   var kept = null
   try { kept = parseInt(sessionStorage.getItem("scene"), 10) } catch (e) {}
   if (kept === null || isNaN(kept) || kept < 0 || kept >= s.length) {
-    kept = Math.floor(Math.random() * s.length)
+    kept = ${DEFAULT_SCENE}
     remember(kept)
   }
   show(kept)
@@ -443,10 +510,18 @@ ${footer(out, t)}
     })
   })
 
+  // The download button starts on the release page, which is right for every system. On Windows
+  // and on a Linux desktop it points straight at that system's installer instead; a phone, a
+  // Chromebook or a Mac keeps the release page, since there is no build for them to fetch.
   var download = document.getElementById("download")
   if (download) {
-    var platform = /Windows|Win64|Win32/.test(navigator.userAgent) ? ${JSON.stringify(t.windows)} : /Linux|X11/.test(navigator.userAgent) ? ${JSON.stringify(t.linux)} : null
-    if (platform) download.textContent = ${JSON.stringify(t.downloadFor)} + platform
+    var ua = navigator.userAgent
+    var os = /Windows|Win64|Win32/.test(ua) ? "windows" : /Android|CrOS/.test(ua) ? null : /Linux|X11/.test(ua) ? "linux" : null
+    var osNames = { windows: ${JSON.stringify(t.windows)}, linux: ${JSON.stringify(t.linux)} }
+    if (os && download.getAttribute("data-" + os)) {
+      download.href = download.getAttribute("data-" + os)
+      download.querySelector("span").textContent = ${JSON.stringify(t.downloadFor)} + osNames[os]
+    }
   }
 })()
 </script>
@@ -619,7 +694,11 @@ function lineChart(points, t) {
 <p class="chart-note">${escape(note)}</p>`
 }
 
-function releasesSection(t) {
+/** A numbered section heading, the ModDB page's: a counter and a label above the title. */
+const sectionHead = (n, id, eyebrow, title, intro = "") =>
+  `<header class="section-head"><p class="eyebrow"><span class="num">${String(n).padStart(2, "0")}</span>${escape(eyebrow)}</p><h2 id="${id}-heading">${escape(title)}</h2>${intro ? `<p class="section-intro">${intro}</p>` : ""}</header>`
+
+function releasesSection(t, n) {
   if (!releases) return ""
   const chip = `<span class="chip">${escape(t.prerelease)}</span>`
   const head = (release) => `<span class="release-tag">${escape(release.tag_name)}</span>${release.prerelease ? ` ${chip}` : ""}`
@@ -645,8 +724,8 @@ function releasesSection(t) {
     downloadsLabel: t.downloadsLabel,
     newRelease: t.newRelease
   }
-  return `<section id="releases" class="panel section" aria-labelledby="releases-heading" data-live-config="${escape(JSON.stringify(config))}">
-<h2 id="releases-heading">${escape(t.releases)}</h2>
+  return `<section id="releases" class="panel section reveal" aria-labelledby="releases-heading" data-live-config="${escape(JSON.stringify(config))}">
+${sectionHead(n, "releases", t.releases, t.releasesTitle)}
 <article class="release release-latest prose">
 <h3>${head(latest)} <span class="release-date">${escape(day(latest.published_at, t))}</span></h3>
 ${notes(latest.body)}
@@ -684,14 +763,75 @@ const SHOTS = [
   "10-accent-teal"
 ]
 
-/** The gallery, one figure per screenshot. Sizes are on the tags so nothing reflows as they load. */
-const gallery = (out, t) => `<section id="shots" class="panel section" aria-labelledby="shots-heading">
-<h2 id="shots-heading">${escape(t.screenshots)}</h2>
-<ul class="shots">${SHOTS.map((name, i) => {
-  const [alt, caption] = t.shots[i]
-  return `<li><figure class="shot"><img src="${escape(linkTo(out, `shots/${name}.webp`))}" alt="${escape(alt)}" width="1280" height="720" loading="lazy"><figcaption>${escape(caption)}</figcaption></figure></li>`
-}).join("")}</ul>
-</section>`
+/*
+ * The animated clips recorded for the ModDB page, each with the still screenshot that stands in for
+ * it when the reader asks for reduced motion. Pairs with the locale's `clips` list at the same index.
+ */
+const CLIPS = [
+  ["mods", "02-mods-browse"],
+  ["select", "05-manage-mods-selection"],
+  ["check", "15-mod-health"],
+  ["session", "16-session-chart"],
+  ["accent", "10-accent-teal"]
+]
+
+/** Addresses the landing's prose links to, by the key a locale string names them with. */
+const WEBLATE = "https://hosted.weblate.org/projects/riftlauncher/"
+const urlsFor = (out) => ({
+  vsLauncher: "https://github.com/XurxoMF/vs-launcher",
+  xurxo: "https://github.com/XurxoMF",
+  stratum: "https://github.com/StratumServer",
+  contributors: linkTo(out, "docs/important-info/contributors.html"),
+  privacy: linkTo(out, "privacy.html"),
+  prs: `${REPO}/pulls?q=is%3Apr+is%3Amerged`,
+  issues: `${REPO}/issues`,
+  releases: RELEASES,
+  discord: DISCORD,
+  docs: linkTo(out, "docs/index.html"),
+  weblate: WEBLATE,
+  kofi: "https://ko-fi.com/zaldaryon",
+  opencollective: "https://opencollective.com/stratum"
+})
+
+/**
+ * Locale prose with links in it. `{key:label}` becomes a link to the address `urls` holds under that
+ * key, the label translated in place with the rest of the sentence; a key nobody defined fails the
+ * build rather than publishing a dead link.
+ */
+const rich = (text, urls) =>
+  escape(text).replace(/\{(\w+):([^}]+)\}/g, (_, key, label) => {
+    if (!(key in urls)) throw new Error(`Unknown link key {${key}:} in "${text}"`)
+    return `<a href="${escape(urls[key])}">${label}</a>`
+  })
+
+/*
+ * The installers on a release, by the system they are for. Anything the release does not carry
+ * falls back to the release page, so a renamed file sends the reader somewhere that works.
+ */
+const FILES = [
+  ["windows", /-setup\.exe$/i],
+  ["appimage", /\.AppImage$/i],
+  ["deb", /\.deb$/i],
+  ["rpm", /\.rpm$/i],
+  ["pacman", /\.pacman$/i]
+]
+
+function filesOf(release, t) {
+  const mb = new Intl.NumberFormat(t.dateLocale, { style: "unit", unit: "megabyte", maximumFractionDigits: 0 })
+  return Object.fromEntries(
+    FILES.map(([key, pattern]) => {
+      const asset = release?.assets.find((a) => pattern.test(a.name))
+      return [key, asset ? { url: asset.browser_download_url, name: asset.name, size: mb.format(asset.size / 1048576) } : { url: release?.html_url ?? RELEASES, name: "", size: "" }]
+    })
+  )
+}
+
+/** Deterministic embers, so two builds of the same page are byte for byte the same. */
+const embers = Array.from({ length: 14 }, (_, i) => {
+  const x = (i * 37 + 11) % 100
+  const size = 2 + (i % 3)
+  return `<span style="--x:${x}%;--s:${size}px;--d:${6 + (i % 5) * 1.3}s;--t:${((i * 0.9) % 7).toFixed(1)}s;--dx:${((i % 7) - 3) * 12}px"></span>`
+}).join("")
 
 /**
  * One landing per locale. Every path here is worked out from the page's own depth, so the French
@@ -699,29 +839,93 @@ const gallery = (out, t) => `<section id="shots" class="panel section" aria-labe
  */
 function landing(t) {
   const out = landingOut(t)
+  const urls = urlsFor(out)
+  const at = (name) => escape(linkTo(out, name))
+  const latest = releases?.[0]
+  const files = filesOf(latest, t)
+  const card = ([icon, title, ...texts]) =>
+    `<li class="feature">${ICON[icon]}<h3>${escape(title)}</h3>${texts.map((text) => `<p>${rich(text, urls)}</p>`).join("")}</li>`
+  const fileLink = (key) =>
+    `<li><a class="file" href="${escape(files[key].url)}">${ICON.download}<span class="file-label">${escape(t.fileLabels[key])}</span><span class="file-size">${escape(files[key].size)}</span>${files[key].name ? `<span class="file-name">${escape(files[key].name)}</span>` : ""}</a></li>`
+
+  const sections = [
+    ["about", t.navAbout, (n) => `<section id="about" class="panel section reveal" aria-labelledby="about-heading">
+${sectionHead(n, "about", t.aboutEyebrow, t.aboutTitle)}
+<div class="story">
+<div class="lineage" aria-hidden="true"><div class="node"><span class="node-mark">VS</span><span><strong>VS Launcher</strong>${escape(t.lineage[0])}</span></div><div class="link-line"></div><div class="node"><img src="${at(EMBLEM)}" alt="" width="320" height="320" loading="lazy"><span><strong>RiftLauncher</strong>${escape(t.lineage[1])}</span></div></div>
+<div>${t.about.map((text) => `<p>${rich(text, urls)}</p>`).join("")}</div>
+</div>
+</section>`],
+    ["motion", null, (n) => `<section id="motion" class="panel section reveal" aria-labelledby="motion-heading">
+${sectionHead(n, "motion", t.motionEyebrow, t.motionTitle, escape(t.motionIntro))}
+<ol class="clips">${CLIPS.map(([clip, still], i) => {
+      const [tag, title, first, second, alt] = t.clips[i]
+      return `<li class="clip reveal"><div class="clip-media"><picture><source media="(prefers-reduced-motion: reduce)" srcset="${at(`shots/${still}.webp`)}"><img src="${at(`moddb/${clip}.webp`)}" alt="${escape(alt)}" width="960" height="540" loading="lazy" decoding="async"></picture></div><div class="clip-text"><p class="tag">${escape(tag)}</p><h3>${escape(title)}</h3><p>${rich(first, urls)}</p><p>${rich(second, urls)}</p></div></li>`
+    }).join("")}</ol>
+</section>`],
+    ["features", t.navFeatures, (n) => `<section id="features" class="panel section reveal" aria-labelledby="features-heading">
+${sectionHead(n, "features", t.featuresEyebrow, t.features, escape(t.featuresIntro))}
+<ul class="cards cards-3">${t.cards.map(card).join("")}</ul>
+</section>`],
+    ["shots", null, (n) => `<section id="shots" class="panel section reveal" aria-labelledby="shots-heading">
+${sectionHead(n, "shots", t.shotsEyebrow, t.screenshots, escape(t.shotsIntro))}
+<ul class="shots">${SHOTS.map((name, i) => {
+      const [alt, caption] = t.shots[i]
+      return `<li><figure class="shot"><div class="shot-frame"><img src="${at(`shots/${name}.webp`)}" alt="${escape(alt)}" width="1280" height="720" loading="lazy" decoding="async"></div><figcaption>${escape(caption)}</figcaption></figure></li>`
+    }).join("")}</ul>
+</section>`],
+    ["trust", null, (n) => `<section id="trust" class="panel section reveal" aria-labelledby="trust-heading">
+${sectionHead(n, "trust", t.trustEyebrow, t.trustTitle)}
+<ul class="cards">${t.trust.map(card).join("")}</ul>
+</section>`],
+    ["install", t.navInstall, (n) => `<section id="install" class="panel section reveal" aria-labelledby="install-heading">
+${sectionHead(n, "install", t.installEyebrow, t.installTitle, rich(t.installIntro, urls))}
+<div class="os-grid">
+<div class="os"><h3>${ICON.windows}${escape(t.windows)}</h3><p>${rich(t.installWindows, urls)}</p><ul class="files">${fileLink("windows")}</ul><a class="guide" href="${at("docs/get-started/installation/windows.html")}">${escape(t.guideWindows)}</a></div>
+<div class="os"><h3>${ICON.linux}${escape(t.linux)}</h3><p>${rich(t.installLinux, urls)}</p><ul class="files">${["appimage", "deb", "rpm", "pacman"].map(fileLink).join("")}</ul><a class="guide" href="${at("docs/get-started/installation/linux.html")}">${escape(t.guideLinux)}</a></div>
+<div class="os os-muted"><h3>${ICON.macos}macOS</h3><p>${rich(t.installMac, urls)}</p><a class="guide" href="${at("docs/get-started/installation/macos.html")}">${escape(t.guideMac)}</a></div>
+</div>
+<div class="notes">${t.installNotes.map(([title, text]) => `<div class="note"><h3>${escape(title)}</h3><p>${rich(text, urls)}</p></div>`).join("")}</div>
+</section>`],
+    ...(releases ? [["releases", t.navReleases, (n) => releasesSection(t, n)]] : []),
+    ["help", t.navHelp, (n) => `<section id="help" class="panel section reveal" aria-labelledby="help-heading">
+${sectionHead(n, "help", t.helpEyebrow, t.helpTitle)}
+<ul class="cards cards-4">${t.help.map(card).join("")}</ul>
+<p class="support">${rich(t.support, urls)}</p>
+</section>`]
+  ]
+
+  const releaseLine = latest
+    ? `${fill(escape(t.releaseLine), { tag: `<span class="mono">${escape(latest.tag_name)}</span>`, date: escape(day(latest.published_at, t)) })} <a href="#install">${escape(t.otherFiles)}</a>`
+    : `<a href="#install">${escape(t.otherFiles)}</a>`
+
   const body = `<main id="main" class="landing">
-<section class="hero panel">
-<div class="hero-column">
-<img class="hero-emblem" src="${escape(linkTo(out, "branding/riftlauncher-full.png"))}" alt="" width="1254" height="1254">
-<p class="kicker">${escape(t.kicker)}</p>
-<h1>${escape(t.headline)}</h1>
+<section class="hero" aria-labelledby="hero-heading">
+<div class="hero-copy panel">
+<p class="kicker"><span class="kicker-dot" aria-hidden="true"></span>${escape(t.kicker)}</p>
+<h1 id="hero-heading">${escape(t.headline)}</h1>
 <p class="lead">${escape(t.lead)}</p>
-<p class="cta"><a class="button" id="download" href="${RELEASES}/latest">${escape(t.download)}</a> <a class="quiet" href="#features">${escape(t.seeFeatures)}</a> <a class="quiet" href="${escape(linkTo(out, "docs/index.html"))}">${escape(t.docs)}</a></p>
+<ul class="chips">${latest ? `<li class="chip-accent">${escape(latest.tag_name)}</li>` : ""}${t.heroChips.map((chip) => `<li>${escape(chip)}</li>`).join("")}</ul>
+<div class="cta"><a class="button button-primary" id="download" href="${escape(latest?.html_url ?? RELEASES)}" data-windows="${escape(files.windows.url)}" data-linux="${escape(files.appimage.url)}">${ICON.download}<span>${escape(t.download)}</span></a><a class="button button-ghost" href="${at("docs/index.html")}">${ICON.docs}<span>${escape(t.docs)}</span></a></div>
+<p class="release-line">${releaseLine}</p>
 ${t.docsNote ? `<p class="docs-note">${escape(t.docsNote)}</p>\n` : ""}<p class="ribbon">${escape(t.beta)}</p>
-<ul class="platforms">${t.platforms.map(([name, file]) => `<li><a href="${RELEASES}/latest">${escape(name)}</a> <span>${escape(file)}</span></li>`).join("")}</ul>
+</div>
+<div class="hero-visual">
+<div class="embers" aria-hidden="true">${embers}</div>
+<div class="window"><div class="window-bar" aria-hidden="true"><span></span><span></span><span></span></div><img src="${at("shots/01-home.webp")}" alt="${escape(t.shots[0][0])}" width="1280" height="720" fetchpriority="high"></div>
+<img class="hero-emblem" src="${at(EMBLEM)}" alt="" width="320" height="320">
 </div>
 </section>
-<section id="features" class="panel section" aria-labelledby="features-heading">
-<h2 id="features-heading">${escape(t.features)}</h2>
-<ul class="cards">${t.cards
-    .map(([icon, title, text]) => `<li class="feature">${ICON[icon]}<h3>${escape(title)}</h3><p>${escape(text)}</p></li>`)
-    .join("")}</ul>
-</section>
-${gallery(out, t)}
-${releasesSection(t)}
+<a class="scroll-cue" href="#motion">${escape(t.seeFeatures)}${line('<path d="M6 9l6 6 6-6"/>')}</a>
+<img class="divider" src="${at("moddb/divider.webp")}" alt="" width="960" height="24" loading="lazy">
+${sections.map(([, , render], i) => render(i + 1)).join("\n")}
 </main>`
-  return shell({ out, title: t.title, description: t.description, body, wide: true, t, localized: true })
+  const nav = sections.filter(([, label]) => label).map(([id, label]) => [id, label])
+  return shell({ out, title: t.title, description: t.description, body, wide: true, t, localized: true, sections: nav })
 }
+
+/** The ids the landing defines, which is what the link check holds its anchors to. */
+const LANDING_ANCHORS = ["main", "hero-heading", "about", "motion", "features", "shots", "trust", "install", "help", ...(releases ? ["releases"] : [])]
 
 // ---------------------------------------------------------------- build
 
@@ -744,7 +948,7 @@ for (const page of pages.values()) {
 
 for (const locale of LOCALES) {
   write(landingOut(locale), landing(locale))
-  anchorsByPage.set(landingOut(locale), new Set(["main", "features", "shots", ...(releases ? ["releases"] : [])]))
+  anchorsByPage.set(landingOut(locale), new Set(LANDING_ANCHORS))
 }
 
 cpSync(join(ROOT, "assets"), OUT, { recursive: true })

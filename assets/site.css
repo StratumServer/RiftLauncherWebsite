@@ -7,71 +7,58 @@
  * worst case: the image being pure white. The launcher's own arithmetic (tests/text-contrast.test.ts
  * in the launcher repository) applied to the stack below, against a white image:
  *
- *   page scrim 70% + panel 60%  ->  88% effective
- *     zinc-100 headline  13.65:1
- *     zinc-200 body      11.83:1
- *     zinc-400 secondary  5.86:1
- *     vsl links           5.97:1
+ *   page scrim 70% + panel 62%  ->  88.6% effective
+ *     zinc-100 headline  13.9:1
+ *     zinc-200 body      12.0:1
+ *     zinc-400 secondary  5.9:1
+ *     vsl links and eyebrows  6.0:1
  *
- *   the same stack + the beta ribbon's own 55%  ->  94.6% effective
- *     zinc-200 ribbon text  14.21:1
- *     zinc-400 ribbon text   7.03:1
+ * The panels carry a zinc-800 sheen in their top-left corner, the one the ModDB page uses. At its
+ * brightest it lifts the effective background from rgb(37) to rgb(38), which moves none of the
+ * ratios above by more than a rounding step.
  *
- * The launcher pairs a 70% shell with 40% panels, which lands zinc-400 at 4.76:1. That clears the
- * 4.5:1 bar with almost nothing to spare, which is fine for short labels and thin for a site that is
- * mostly running prose, so the panels here are heavier. No text is ever painted on the page scrim
- * alone: zinc-400 reads 3.01:1 there, well under the bar.
+ * Cards inside a panel (features, clips, releases, install) add their own 55% zinc-900 or zinc-950,
+ * so they land darker still and every ratio above only improves on them. No text is ever painted on
+ * the page scrim alone: zinc-400 reads 3.01:1 there, well under the bar. The hero's copy is a panel
+ * like any other; only the screenshot and the decoration beside it sit on the bare scrim.
  *
- * The download button is opaque, so nothing composites: white on vs is 6.88:1.
+ * The primary button is opaque vsl with zinc-900 text, 7.9:1, and nothing composites under it. The
+ * ghost buttons are zinc-900 at 85% with zinc-200 text, over 12:1 on any scene.
  *
  * The scene picker hangs off the header and onto the page, so it cannot count on a panel underneath
- * it. It carries its own 92%, which over the page scrim is 97.6% effective:
- *     zinc-400 tile label   7.48:1
- *     zinc-200 tile label  15.10:1
+ * it. It carries its own 92%, which over the page scrim is 97.6% effective (zinc-400 7.48:1). Its
+ * selected tile is marked by an opaque vsl border, 7.62:1 against the popup.
  *
- * The picker's selected tile is marked the way the launcher marks a selection, an opaque vsl border,
- * and that border is the only thing saying which scene is showing, so it needs the 3:1 a non-text
- * indicator needs. It touches the popup on one side, 7.62:1, and a 2px zinc-950 inset on the other,
- * 7.91:1, so it never has to be read against the photograph itself. The 10% white hairline around
- * the panels and the unselected tiles is decoration, not state, and is not held to that bar.
+ * The download bars are the one graphic carrying a number, painted in vsl (7.17:1 on their card);
+ * the count inside a bar is zinc-950 on vsl, 7.91:1.
  *
- * The icons are line work at the same colours as the links they replace, so they clear the 3:1 a
- * non-text mark needs several times over: zinc-400 in the bar 5.86:1, vsl on hover and in the
- * footer 5.97:1. An icon with no word beside it carries a ring instead of an underline, at those
- * same two ratios.
- *
- * The landing's feature cards and release cards sit inside a panel and carry the beta ribbon's own
- * 55%, so they land on the stack the ribbon already uses, 94.6% effective:
- *     zinc-100 card heading  16.40:1
- *     zinc-200 card text     14.21:1
- *     zinc-400 dates         7.03:1
- *     vsl links              7.17:1
- *
- * The beta chip is a 55% zinc-950 fill on a release card, 97.6% effective, with vsl text and a vsl
- * border: text 7.62:1, and the border 7.17:1 against the card it is drawn on. The word beta is what
- * says a release is a prerelease, so the chip's own outline is decoration and not held to 3:1.
- *
- * The download bars sit on a card with the rest of the releases, and they are the one graphic here
- * carrying a number, so they are held to the 3:1 a non-text mark needs. The brand's darker vs
- * (#7e501e) reads 2.62:1 on that card and fails it; vsl reads 7.17:1 and is what the bars are
- * painted in, the curve above them included. Their track is a 10% white hairline, decoration under a
- * bar whose length is printed beside it either way. The count inside a bar is zinc-950 on vsl,
- * 7.91:1, and the tag above it, along with a count too long to fit inside its bar, is zinc-200 on
- * the card at 14.21:1.
+ * Motion: everything that moves on its own (the embers, the emblem, the glow, the scroll reveals,
+ * the progress line) is switched off under prefers-reduced-motion, and the animated clips are
+ * swapped for still screenshots by a <source> in the markup, since CSS cannot pause an image.
  */
 
 :root {
   --vs: #7e501e;
   --vsl: #d49754;
+  --vsh: #e6b381;
   --vsd: #4f3110;
+  --ink: #1c1917;
   --zinc-950: #09090b;
+  --zinc-900: #18181b;
+  --zinc-800: #27272a;
+  --bright: #f4f4f5;
   --text: #e4e4e7;
   --muted: #a1a1aa;
-  --panel: rgba(9, 9, 11, 0.6);
+  --panel: rgba(9, 9, 11, 0.62);
+  --sheen: linear-gradient(160deg, rgba(39, 39, 42, 0.55), rgba(9, 9, 11, 0.35) 55%);
+  --card: rgba(24, 24, 27, 0.6);
   --hairline: rgba(161, 161, 170, 0.16);
   --edge: rgba(255, 255, 255, 0.1);
+  --glow: 0 0 0 1px rgba(212, 151, 84, 0.45), 0 0 34px rgba(212, 151, 84, 0.2);
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  color-scheme: dark;
 }
 
 *,
@@ -80,8 +67,15 @@
   box-sizing: border-box;
 }
 
+/* No background here: the body's has to propagate to the canvas, or it would paint over the scene. */
 html {
-  scroll-padding-top: 5rem;
+  scroll-padding-top: 5.5rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 /* A column the height of the window, so the footer sits on the bottom edge of a short page. */
@@ -95,6 +89,7 @@ body {
   font-family: var(--sans);
   font-size: 1rem;
   line-height: 1.65;
+  overflow-x: clip;
 }
 
 /* The scene and the scrim that makes it a surface, both out of the way of everything else. */
@@ -106,41 +101,41 @@ body {
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
-  /* The dark underlay is what shows while the scene file arrives, so a slow first load dims
-     instead of flashing; once cached, later pages paint the same file immediately. */
-  transition: opacity 300ms ease;
 }
 
 .scrim {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: rgba(9, 9, 11, 0.7);
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(126, 80, 30, 0.18), transparent 60%),
+    rgba(9, 9, 11, 0.7);
 }
 
 a {
   color: var(--vsl);
   text-decoration: underline;
   text-underline-offset: 0.15em;
+  transition: color 0.15s ease;
 }
 
 a:hover {
-  color: #e6b381;
+  color: var(--vsh);
 }
 
 :focus-visible {
   outline: 2px solid var(--vsl);
-  outline-offset: 2px;
-  border-radius: 2px;
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
 .skip {
   position: absolute;
   left: -9999px;
   top: 0;
-  z-index: 10;
+  z-index: 50;
   padding: 0.6rem 1rem;
-  background: #09090b;
+  background: var(--zinc-950);
   color: var(--text);
 }
 
@@ -149,49 +144,138 @@ a:hover {
   top: 0.5rem;
 }
 
+.mono {
+  font-family: var(--mono);
+}
+
 /* ------------------------------------------------------------------ chrome */
 
-/* The bar owns a stacking context above the page so the picker's panel hangs over the panels. */
+/* Sticky, and owning a stacking context above the page so the pickers' panels hang over it. */
 .topbar {
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 30;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
-  align-items: baseline;
+  gap: 0.5rem 1rem;
+  align-items: center;
   justify-content: space-between;
-  padding: 0.75rem clamp(1rem, 4vw, 2.5rem);
-  background: var(--panel);
+  min-height: 3.75rem;
+  padding: 0.55rem clamp(1rem, 4vw, 2.5rem);
+  background: rgba(9, 9, 11, 0.78);
   border-bottom: 1px solid var(--edge);
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(10px) saturate(1.2);
+}
+
+/* How far down the page you are, drawn by the browser from the scroll position with no script. */
+.progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, var(--vs), var(--vsl), var(--vsh));
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .progress {
+      animation: progress linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+}
+
+@keyframes progress {
+  to {
+    transform: scaleX(1);
+  }
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 0.55rem;
-  font-weight: 700;
-  font-size: 1.05rem;
-  letter-spacing: 0.02em;
-  color: var(--text);
+  font-weight: 800;
+  font-size: 1.08rem;
+  letter-spacing: 0.01em;
+  color: var(--bright);
   text-decoration: none;
+  flex: none;
 }
 
 .brand img {
-  width: 1.7rem;
-  height: auto;
+  width: 1.9rem;
+  height: 1.9rem;
+  transition: transform 0.4s var(--ease);
 }
 
 .brand:hover {
   color: var(--vsl);
 }
 
-/* Held to the right even when the bar wraps, which is what keeps the picker's panel on screen. */
+.brand:hover img {
+  transform: rotate(-8deg) scale(1.08);
+}
+
+/* The landing's own sections, in the bar where there is room for them. */
+.sections {
+  display: none;
+  gap: 0.15rem;
+  margin: 0 auto;
+}
+
+.sections a {
+  position: relative;
+  padding: 0.4rem 0.75rem;
+  border-radius: 7px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.sections a::after {
+  content: "";
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.15rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--vsl);
+  transform: scaleX(0);
+  transition: transform 0.25s var(--ease);
+}
+
+.sections a:hover,
+.sections a[aria-current] {
+  color: var(--bright);
+}
+
+.sections a:hover::after,
+.sections a[aria-current]::after {
+  transform: scaleX(1);
+}
+
+@media (min-width: 64rem) {
+  .sections {
+    display: flex;
+  }
+}
+
 .topbar-end {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   margin-left: auto;
+}
+
+@media (min-width: 64rem) {
+  .sections + .topbar-end {
+    margin-left: 0;
+  }
 }
 
 .icon {
@@ -215,9 +299,10 @@ a:hover {
   width: 2.4rem;
   height: 2.4rem;
   border: 1px solid var(--edge);
-  border-radius: 8px;
+  border-radius: 9px;
   color: var(--muted);
   text-decoration: none;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
 
 .icon-only a:hover,
@@ -225,6 +310,23 @@ a:hover {
   color: var(--vsl);
   border-color: var(--vsl);
   background: rgba(9, 9, 11, 0.6);
+}
+
+@media (max-width: 30rem) {
+  .brand span {
+    display: none;
+  }
+
+  .topbar-end,
+  .icon-only {
+    gap: 0.3rem;
+  }
+
+  .icon-only a,
+  .picker > summary {
+    width: 2.3rem;
+    height: 2.3rem;
+  }
 }
 
 /* The width is explicit because auto side margins in the body's column would shrink these to fit. */
@@ -242,27 +344,29 @@ a:hover {
 
 .layout-wide {
   grid-template-columns: minmax(0, 1fr);
-  max-width: 60rem;
+  max-width: 76rem;
 }
 
 .panel {
-  background: var(--panel);
+  background-color: var(--panel);
+  background-image: var(--sheen);
   border: 1px solid var(--edge);
-  border-radius: 10px;
+  border-radius: 14px;
   backdrop-filter: blur(6px);
 }
 
 /* ---------------------------------------------------------------- sidebar */
 
 .nav-shell {
-  background: var(--panel);
+  background-color: var(--panel);
+  background-image: var(--sheen);
   border: 1px solid var(--edge);
-  border-radius: 10px;
+  border-radius: 14px;
   backdrop-filter: blur(6px);
   padding: 0.75rem 1rem 1rem;
   position: sticky;
-  top: 1.5rem;
-  max-height: calc(100vh - 3rem);
+  top: 5rem;
+  max-height: calc(100vh - 6.5rem);
   overflow-y: auto;
 }
 
@@ -293,11 +397,12 @@ a:hover {
 
 .nav a {
   display: block;
-  padding: 0.2rem 0.4rem;
-  border-radius: 5px;
+  padding: 0.2rem 0.45rem;
+  border-radius: 6px;
   color: var(--text);
   text-decoration: none;
   font-size: 0.94rem;
+  transition: color 0.15s ease, background 0.15s ease;
 }
 
 .nav a:hover {
@@ -331,7 +436,7 @@ a:hover {
   border-left: 5px solid var(--muted);
   border-top: 4px solid transparent;
   border-bottom: 4px solid transparent;
-  transition: transform 0.12s ease;
+  transition: transform 0.15s ease;
 }
 
 .nav details[open] > summary::before {
@@ -345,10 +450,8 @@ a:hover {
 /* ------------------------------------------------------------------ prose */
 
 /*
- * Prose spans its column. Nothing here caps a line length: the panel beside the sidebar is the
- * width, and headings, tables, callouts and rules all run to its edge. Images are held to the
- * column so they scale into it instead of over it, and a code block or a wide table scrolls inside
- * its own box rather than pushing the page sideways.
+ * Prose spans its column. Images are held to the column so they scale into it instead of over it,
+ * and a code block or a wide table scrolls inside its own box rather than pushing the page sideways.
  */
 .prose {
   padding: clamp(1.25rem, 4vw, 2.5rem);
@@ -356,11 +459,16 @@ a:hover {
   overflow-wrap: break-word;
 }
 
+main.prose {
+  border-top: 2px solid rgba(212, 151, 84, 0.55);
+}
 
 .prose h1 {
   margin: 0 0 1.25rem;
-  font-size: clamp(1.7rem, 4vw, 2.25rem);
-  line-height: 1.2;
+  font-size: clamp(1.75rem, 4vw, 2.4rem);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--bright);
 }
 
 .prose h2 {
@@ -369,11 +477,13 @@ a:hover {
   line-height: 1.3;
   padding-bottom: 0.35rem;
   border-bottom: 1px solid var(--hairline);
+  color: var(--bright);
 }
 
 .prose h3 {
   margin: 1.75rem 0 0.5rem;
   font-size: 1.15rem;
+  color: var(--bright);
 }
 
 .prose h4,
@@ -409,7 +519,7 @@ a:hover {
 .prose img {
   max-width: 100%;
   height: auto;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid var(--hairline);
 }
 
@@ -483,7 +593,7 @@ code {
 .callout {
   margin: 1.25rem 0;
   padding: 0.9rem 1.1rem;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid var(--hairline);
   border-left: 4px solid var(--muted);
   background: rgba(9, 9, 11, 0.55);
@@ -513,8 +623,14 @@ code {
   margin: 0.75rem 0;
   padding: 0.7rem 1rem;
   border: 1px solid var(--hairline);
-  border-radius: 8px;
+  border-radius: 10px;
   background: rgba(9, 9, 11, 0.55);
+  transition: border-color 0.2s ease, transform 0.2s var(--ease);
+}
+
+.card:hover {
+  border-color: rgba(212, 151, 84, 0.6);
+  transform: translateX(3px);
 }
 
 .card p {
@@ -555,63 +671,181 @@ code {
   border-left-color: transparent;
 }
 
-/* ---------------------------------------------------------------- landing */
+/* ------------------------------------------------------------------ buttons */
 
-/* One editorial column. The emblem opens it, echoed small in the bar. */
-.hero-emblem {
-  width: 3.5rem;
-  height: 3.5rem;
-  margin-bottom: 1rem;
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.9rem;
+  padding: 0.65rem 1.1rem;
+  border-radius: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s var(--ease), box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
-@media (min-width: 100rem) {
-  .hero-emblem {
-    width: 4.5rem;
-    height: 4.5rem;
+
+.button-primary {
+  background: var(--vsl);
+  color: var(--ink);
+  border: 1px solid var(--vsh);
+  box-shadow: var(--glow);
+}
+
+.button-primary:hover {
+  background: var(--vsh);
+  color: var(--ink);
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1px rgba(230, 179, 129, 0.6), 0 10px 40px rgba(212, 151, 84, 0.35);
+}
+
+.button-primary .icon {
+  transition: transform 0.3s var(--ease);
+}
+
+.button-primary:hover .icon {
+  transform: translateY(2px);
+}
+
+.button-ghost {
+  background: rgba(24, 24, 27, 0.85);
+  color: var(--text);
+  border: 1px solid #52525b;
+}
+
+.button-ghost:hover {
+  color: var(--bright);
+  border-color: var(--vsl);
+  transform: translateY(-2px);
+}
+
+/* ------------------------------------------------------------------- hero */
+
+.landing {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+  min-width: 0;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  align-items: center;
+  padding-top: clamp(0.5rem, 3vw, 2.5rem);
+}
+
+@media (min-width: 72rem) {
+  .hero {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: clamp(1.5rem, 3vw, 3rem);
   }
 }
-.hero {
-  padding: clamp(1.75rem, 5vw, 3.25rem) 0 0;
-}
 
-/* Full panel width; the padding alone frames the text. */
-.hero-column {
-  padding: 0 clamp(1.25rem, 5vw, 3rem) clamp(1.75rem, 4vw, 2.5rem);
+.hero-copy {
+  position: relative;
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+  border-top: 2px solid rgba(212, 151, 84, 0.55);
 }
 
 .kicker {
-  margin: 0 0 0.6rem;
-  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.9rem;
+  color: var(--vsl);
   font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-weight: 700;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
 }
 
-/* Sized so the sentence lands on two lines at the width the column gives it, phone included. */
+/* A rift's pulse beside the kicker, the one ornament in the copy. */
+.kicker-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: #5fd4e6;
+  box-shadow: 0 0 0 0 rgba(95, 212, 230, 0.6);
+  animation: beacon 2.4s ease-out infinite;
+}
+
+@keyframes beacon {
+  0% {
+    box-shadow: 0 0 0 0 rgba(95, 212, 230, 0.55);
+  }
+  80%,
+  100% {
+    box-shadow: 0 0 0 0.6rem rgba(95, 212, 230, 0);
+  }
+}
+
 .hero h1 {
   margin: 0 0 1rem;
-  font-size: clamp(1.6rem, 5vw, 2.75rem);
+  font-size: clamp(2rem, 4.4vw, 3.3rem);
   font-weight: 800;
-  line-height: 1.08;
-  letter-spacing: -0.02em;
-  color: #f4f4f5;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  color: var(--bright);
+  text-wrap: balance;
+}
+
+@supports (background-clip: text) {
+  .hero h1 {
+    background: linear-gradient(100deg, #fafafa 20%, var(--vsh) 70%, var(--vsl));
+    background-clip: text;
+    color: transparent;
+  }
 }
 
 .lead {
-  margin: 0 0 1.75rem;
-  font-size: 1.05rem;
+  margin: 0 0 1.25rem;
+  font-size: clamp(1rem, 1.6vw, 1.12rem);
   color: var(--text);
+  max-width: 38rem;
+}
+
+.chips {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0 0 1.5rem;
+  padding: 0;
+}
+
+.chips li {
+  padding: 0.2rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(24, 24, 27, 0.8);
+  color: #d4d4d8;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.chips .chip-accent {
+  border-color: var(--vsl);
+  color: var(--vsl);
+  font-family: var(--mono);
 }
 
 .cta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem 1.5rem;
-  margin: 0 0 1.25rem;
+  gap: 0.65rem;
+  margin: 0 0 0.9rem;
 }
 
-.quiet {
+.release-line {
+  margin: 0 0 1.25rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.release-line a {
+  margin-left: 0.35rem;
   font-weight: 600;
 }
 
@@ -622,130 +856,511 @@ code {
   font-size: 0.85rem;
 }
 
-/* The beta caveat, one line next to the button rather than a paragraph of its own. */
+/* The beta caveat, one line under the button rather than a paragraph of its own. */
 .ribbon {
-  display: inline-block;
-  margin: 0 0 1.5rem;
-  padding: 0.35rem 0.85rem;
-  border-radius: 6px;
-  border: 1px solid var(--edge);
-  border-left: 3px solid #eab308;
-  background: rgba(9, 9, 11, 0.55);
-  color: var(--text);
+  margin: 0;
+  padding: 0.55rem 0.9rem;
+  border-radius: 9px;
+  border: 1px solid rgba(212, 151, 84, 0.3);
+  background: rgba(212, 151, 84, 0.1);
+  color: #d4d4d8;
   font-size: 0.87rem;
 }
 
-.button {
-  display: inline-block;
-  padding: 0.7rem 1.75rem;
-  border-radius: 8px;
-  background: var(--vs);
+/* The launcher itself beside the copy, tilted towards the reader, with the emblem floating off it. */
+.hero-visual {
+  position: relative;
+  padding: 1.5rem 0.5rem 2.5rem;
+  perspective: 1600px;
+}
+
+.hero-visual::before {
+  content: "";
+  position: absolute;
+  inset: 8% 4% 12%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(212, 151, 84, 0.42), rgba(126, 80, 30, 0.15) 60%, transparent);
+  filter: blur(28px);
+  animation: breathe 7s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.6;
+    transform: scale(1.06);
+  }
+}
+
+.window {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
   border: 1px solid var(--vsl);
-  color: #fff;
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
+  background: var(--zinc-950);
+  box-shadow: var(--glow), 0 30px 60px rgba(0, 0, 0, 0.55);
+  transform: rotateY(-9deg) rotateX(4deg);
+  transition: transform 0.7s var(--ease);
 }
 
-.button:hover {
-  background: #96601f;
-  color: #fff;
+.hero-visual:hover .window {
+  transform: none;
 }
 
-.platforms {
-  list-style: none;
+.window-bar {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem 1.5rem;
-  margin: 0 0 1.25rem;
-  padding: 0;
-  font-size: 0.88rem;
-  color: var(--muted);
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--zinc-900);
+  border-bottom: 1px solid var(--edge);
 }
 
-.platforms span {
-  color: var(--muted);
-  font-family: var(--mono);
-  font-size: 0.85em;
+.window-bar span {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: #3f3f46;
 }
 
-.platforms a:hover {
-  text-decoration-thickness: 2px;
+.window-bar span:first-child {
+  background: var(--vsl);
 }
 
-/* ------------------------------------------------- features and releases */
-
-/* Hero, features, releases: one column of panels on the landing's own axis and width. */
-.landing {
-  display: grid;
-  gap: 1.5rem;
-  min-width: 0;
+.window img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
+
+.hero-emblem {
+  position: absolute;
+  z-index: 2;
+  left: -0.5rem;
+  bottom: 0;
+  width: clamp(4.5rem, 11vw, 7.5rem);
+  height: auto;
+  filter: drop-shadow(0 0 22px rgba(95, 212, 230, 0.45)) drop-shadow(0 10px 20px rgba(0, 0, 0, 0.6));
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  50% {
+    transform: translateY(-12px) rotate(-3deg);
+  }
+}
+
+/* Embers rising off the lava behind the window, as on the ModDB banner. */
+.embers {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.embers span {
+  position: absolute;
+  bottom: -8px;
+  left: var(--x);
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background: #f5b56a;
+  box-shadow: 0 0 8px 2px rgba(240, 150, 70, 0.7);
+  opacity: 0;
+  animation: rise var(--d) linear var(--t) infinite;
+}
+
+@keyframes rise {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(var(--dx), -26rem);
+    opacity: 0;
+  }
+}
+
+/* Under the hero, pointing at the clips, with a chevron that nods downwards. */
+.scroll-cue {
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(9, 9, 11, 0.7);
+  border: 1px solid var(--edge);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+}
+
+.scroll-cue:hover {
+  color: var(--vsl);
+  border-color: var(--vsl);
+}
+
+.scroll-cue .icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--vsl);
+  animation: nod 2s ease-in-out infinite;
+}
+
+@keyframes nod {
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+/* The animated divider from the ModDB page, between the hero and the story. */
+.divider {
+  display: block;
+  width: 100%;
+  max-width: 60rem;
+  height: auto;
+  margin: -0.5rem auto;
+  opacity: 0.9;
+}
+
+/* ---------------------------------------------------------------- sections */
 
 .section {
-  padding: clamp(1.5rem, 4vw, 2.5rem);
+  padding: clamp(1.4rem, 4vw, 2.75rem);
   min-width: 0;
+  border-top: 2px solid rgba(212, 151, 84, 0.55);
 }
 
-.section > h2 {
-  margin: 0 0 1.25rem;
-  font-size: clamp(1.35rem, 3vw, 1.7rem);
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  color: #f4f4f5;
+.section-head {
+  margin: 0 0 clamp(1.25rem, 3vw, 2rem);
+  max-width: 46rem;
 }
 
-/* Six cards: three and three where there is room, then two and two, then one column on a phone. */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.5rem;
+  color: var(--vsl);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.eyebrow .num {
+  padding: 0.05rem 0.45rem;
+  border: 1px solid var(--vsl);
+  border-radius: 5px;
+  letter-spacing: 0.05em;
+  font-family: var(--mono);
+}
+
+.section-head h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #fff;
+  text-wrap: balance;
+}
+
+.section-intro {
+  margin: 0.6rem 0 0;
+  color: var(--muted);
+  font-size: 1.02rem;
+}
+
+.section h3 {
+  color: var(--bright);
+}
+
+/*
+ * Scroll reveals. The script adds .js to the root before anything paints and .in to each block as
+ * it scrolls into view; with scripting off, or with reduced motion asked for, nothing is ever hidden.
+ * Only opacity and transform move, so nothing reflows.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+  }
+
+  .js .reveal.in {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* A small grid of cards, used by features, trust and help. */
 .cards {
   list-style: none;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 1rem;
+  gap: 0.9rem;
   margin: 0;
   padding: 0;
 }
 
-@media (min-width: 34rem) {
+@media (min-width: 36rem) {
   .cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (min-width: 52rem) {
-  .cards {
+@media (min-width: 60rem) {
+  .cards-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .cards-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
-/* The same 55% the beta ribbon carries, over the panel: a card is readable without a second border. */
 .feature {
-  padding: 1.1rem 1.2rem 1.25rem;
-  border: 1px solid var(--edge);
-  border-radius: 8px;
-  background: rgba(9, 9, 11, 0.55);
+  position: relative;
+  padding: 1.15rem 1.2rem 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-left: 3px solid rgba(212, 151, 84, 0.45);
+  border-radius: 10px;
+  background: var(--card);
+  transition: transform 0.25s var(--ease), border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.feature:hover {
+  transform: translateY(-3px);
+  border-color: rgba(212, 151, 84, 0.5);
+  border-left-color: var(--vsl);
+  background: rgba(24, 24, 27, 0.8);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35), 0 0 24px rgba(212, 151, 84, 0.12);
 }
 
 .feature .icon {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.6rem;
+  height: 1.6rem;
   color: var(--vsl);
+  transition: transform 0.3s var(--ease);
+}
+
+.feature:hover .icon {
+  transform: scale(1.12) rotate(-4deg);
 }
 
 .feature h3 {
-  margin: 0.5rem 0 0.35rem;
-  font-size: 1.02rem;
+  margin: 0.55rem 0 0.35rem;
+  font-size: 1.04rem;
   line-height: 1.3;
-  color: #f4f4f5;
 }
 
 .feature p {
   margin: 0;
-  font-size: 0.93rem;
-  color: var(--text);
+  font-size: 0.94rem;
+  color: #d4d4d8;
 }
 
-/* Screenshots: two side by side where there is room, one column below that. Same card treatment
-   as the features above them, so the section reads as part of the same run of panels. */
+.feature p + p {
+  margin-top: 0.4rem;
+}
+
+/* ------------------------------------------------------------------ about */
+
+.story {
+  display: grid;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+@media (min-width: 52rem) {
+  .story {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 2.5rem;
+  }
+}
+
+.story p {
+  margin: 0 0 0.6rem;
+  color: #d4d4d8;
+}
+
+/* VS Launcher to RiftLauncher, with a spark travelling the line between them. */
+.lineage {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: rgba(24, 24, 27, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.node {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  width: 7rem;
+  text-align: center;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  color: var(--muted);
+}
+
+.node strong {
+  display: block;
+  color: var(--bright);
+  font-size: 0.9rem;
+}
+
+.node-mark {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 12px;
+  border: 1px dashed #52525b;
+  background: var(--zinc-900);
+  color: var(--muted);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.node img {
+  width: 3.5rem;
+  height: 3.5rem;
+  filter: drop-shadow(0 0 12px rgba(95, 212, 230, 0.4));
+}
+
+.link-line {
+  position: relative;
+  flex: 1;
+  min-width: 2.5rem;
+  height: 2px;
+  background: linear-gradient(90deg, #52525b, var(--vsl));
+}
+
+.link-line::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--vsh);
+  box-shadow: 0 0 10px 3px rgba(230, 179, 129, 0.7);
+  animation: travel 2.8s var(--ease) infinite;
+}
+
+@keyframes travel {
+  from {
+    left: 0;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  to {
+    left: calc(100% - 8px);
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------------ clips */
+
+.clips {
+  list-style: none;
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+}
+
+.clip {
+  display: grid;
+  gap: 1rem 1.75rem;
+  align-items: center;
+  padding: 0.85rem;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+@media (min-width: 52rem) {
+  .clip {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    padding: 1rem;
+  }
+
+  .clip:nth-child(even) {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  }
+
+  .clip:nth-child(even) .clip-media {
+    order: 2;
+  }
+}
+
+.clip-media {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(212, 151, 84, 0.45);
+  box-shadow: var(--glow);
+  background: var(--zinc-950);
+  aspect-ratio: 16 / 9;
+  transition: transform 0.4s var(--ease), box-shadow 0.4s ease;
+}
+
+.clip:hover .clip-media {
+  transform: scale(1.012);
+  box-shadow: 0 0 0 1px rgba(212, 151, 84, 0.7), 0 0 44px rgba(212, 151, 84, 0.3);
+}
+
+.clip-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.clip-text {
+  padding: 0 0.35rem 0.35rem;
+}
+
+.tag {
+  display: inline-block;
+  margin: 0 0 0.6rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 5px;
+  background: rgba(212, 151, 84, 0.16);
+  color: var(--vsl);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.clip-text h3 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.15rem, 2vw, 1.35rem);
+  line-height: 1.25;
+}
+
+.clip-text p:not(.tag) {
+  margin: 0 0 0.5rem;
+  color: #d4d4d8;
+}
+
+/* ------------------------------------------------------------------ shots */
+
 .shots {
   list-style: none;
   display: grid;
@@ -755,7 +1370,25 @@ code {
   padding: 0;
 }
 
-@media (min-width: 52rem) {
+/* On a phone the ten screenshots become a row you swipe through, rather than ten screens of scrolling. */
+@media (max-width: 39.99rem) {
+  .shots {
+    grid-auto-flow: column;
+    grid-auto-columns: 86%;
+    grid-template-columns: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    padding-bottom: 0.75rem;
+    scrollbar-color: var(--vs) transparent;
+  }
+
+  .shots > li {
+    scroll-snap-align: start;
+  }
+}
+
+@media (min-width: 40rem) {
   .shots {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -763,32 +1396,204 @@ code {
 
 .shot {
   margin: 0;
-  padding: 0.6rem;
-  border: 1px solid var(--edge);
-  border-radius: 8px;
-  background: rgba(9, 9, 11, 0.55);
+  padding: 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  background: var(--card);
+  transition: border-color 0.25s ease, transform 0.25s var(--ease);
+}
+
+.shot:hover {
+  border-color: rgba(212, 151, 84, 0.5);
+  transform: translateY(-3px);
 }
 
 /* The width and height on the tag hold the space while the file loads, so nothing below jumps. */
+.shot-frame {
+  overflow: hidden;
+  border-radius: 8px;
+}
+
 .shot img {
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 6px;
+  transition: transform 0.6s var(--ease);
+}
+
+.shot:hover img {
+  transform: scale(1.04);
 }
 
 .shot figcaption {
-  margin: 0.65rem 0.3rem 0.15rem;
+  margin: 0.6rem 0.3rem 0.15rem;
   font-size: 0.93rem;
-  color: var(--text);
+  color: #d4d4d8;
 }
 
+/* ---------------------------------------------------------------- install */
+
+.os-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.9rem;
+}
+
+@media (min-width: 60rem) {
+  .os-grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.2fr) minmax(0, 0.75fr);
+  }
+}
+
+.os {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.2rem;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.os h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.os h3 .icon {
+  color: var(--vsl);
+  width: 1.45rem;
+  height: 1.45rem;
+}
+
+.os p {
+  margin: 0;
+  color: #d4d4d8;
+  font-size: 0.94rem;
+}
+
+.os .guide {
+  margin-top: auto;
+  padding-top: 0.25rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.os-muted h3 .icon {
+  color: var(--muted);
+}
+
+.files {
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.2rem 0 0;
+  padding: 0;
+}
+
+.file {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.1rem 0.65rem;
+  align-items: center;
+  padding: 0.55rem 0.75rem;
+  border-radius: 9px;
+  border: 1px solid #3f3f46;
+  background: rgba(9, 9, 11, 0.55);
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s var(--ease);
+}
+
+.file:hover {
+  color: var(--bright);
+  border-color: var(--vsl);
+  background: rgba(79, 49, 16, 0.4);
+  transform: translateX(3px);
+}
+
+.file .icon {
+  grid-row: span 2;
+  color: var(--vsl);
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.file-label {
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.file-size {
+  grid-row: span 2;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.file-name {
+  grid-column: 2;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.9rem;
+  margin-top: 0.9rem;
+}
+
+@media (min-width: 48rem) {
+  .notes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.note {
+  padding: 1rem 1.2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(212, 151, 84, 0.3);
+  background: rgba(212, 151, 84, 0.08);
+}
+
+.note h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.note p {
+  margin: 0;
+  color: #d4d4d8;
+  font-size: 0.94rem;
+}
+
+/* ------------------------------------------------------------------- help */
+
+.support {
+  margin: 1.25rem 0 0;
+  padding: 0.9rem 1.1rem;
+  border-radius: 10px;
+  border: 1px dashed rgba(212, 151, 84, 0.4);
+  color: #d4d4d8;
+  text-align: center;
+}
+
+/* --------------------------------------------------------------- releases */
 
 .release {
   margin: 0 0 1rem;
   padding: 1.1rem 1.3rem;
-  border: 1px solid var(--edge);
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
   background: rgba(9, 9, 11, 0.55);
 }
 
@@ -800,14 +1605,22 @@ code {
   margin-bottom: 0;
 }
 
-.release-latest > h3 {
-  font-size: 1.25rem;
+.release-latest {
+  border-color: rgba(212, 151, 84, 0.45);
+  box-shadow: 0 0 30px rgba(212, 151, 84, 0.08);
 }
 
-/* The note's own heading, two levels down from where it was written, still ahead of its paragraphs. */
+.release-latest > h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 1.3rem;
+}
+
 .release h4 {
   font-size: 1.05rem;
-  color: #f4f4f5;
+  color: var(--bright);
 }
 
 .release-tag {
@@ -828,6 +1641,30 @@ details.release > summary {
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0.5rem;
+  list-style: none;
+}
+
+details.release > summary::-webkit-details-marker {
+  display: none;
+}
+
+details.release > summary::before {
+  content: "";
+  align-self: center;
+  width: 0;
+  height: 0;
+  border-left: 6px solid var(--vsl);
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  transition: transform 0.2s ease;
+}
+
+details.release[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+details.release:hover {
+  border-color: rgba(212, 151, 84, 0.35);
 }
 
 details.release[open] > summary {
@@ -860,13 +1697,13 @@ details.release[open] > summary {
 /*
  * Only assets/live.js ever puts this on the page, and only when GitHub has a release the build did
  * not: the notes below it are the ones this page was built with, and this line says where the newer
- * ones are. Its own rule above the card rather than a colour, since colour alone says nothing.
+ * ones are.
  */
 .live-banner {
   margin: 0 0 1rem;
   padding: 0.7rem 1.3rem;
   border: 1px solid var(--vsl);
-  border-radius: 8px;
+  border-radius: 10px;
   background: rgba(126, 80, 30, 0.25);
   font-weight: 600;
 }
@@ -874,9 +1711,9 @@ details.release[open] > summary {
 /* ------------------------------------------------------------- downloads */
 
 /*
- * Drawn by the build from the counts GitHub reported that morning. There is no viewBox on purpose:
- * bar widths are percentages of the chart's own box and everything else is fixed pixels, so the
- * chart fills the panel at any width and the labels never scale down to unreadable on a phone.
+ * Drawn by the build from the counts GitHub reported. There is no viewBox on purpose: bar widths are
+ * percentages of the chart's own box and everything else is fixed pixels, so the chart fills the
+ * panel at any width and the labels never scale down to unreadable on a phone.
  */
 .chart-block > svg {
   display: block;
@@ -949,15 +1786,18 @@ details.release[open] > summary {
 .picker > summary {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
+  min-width: 2.4rem;
   height: 2.4rem;
   padding: 0 0.7rem;
   border: 1px solid var(--edge);
-  border-radius: 8px;
+  border-radius: 9px;
   color: var(--muted);
   font-size: 0.85rem;
   cursor: pointer;
   list-style: none;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
 
 .picker > summary::-webkit-details-marker {
@@ -971,12 +1811,33 @@ details.release[open] > summary {
   background: rgba(9, 9, 11, 0.6);
 }
 
+/* The scene's name only where the bar has room for it. */
+.picker-name {
+  display: none;
+}
+
+@media (min-width: 80rem) {
+  .picker-name {
+    display: inline;
+  }
+}
+
+@media (max-width: 30rem) {
+  .picker > summary {
+    padding: 0;
+  }
+
+  .lang > summary span {
+    display: none;
+  }
+}
+
 .picker-panel {
   position: absolute;
   right: 0;
   top: calc(100% + 0.5rem);
   z-index: 20;
-  width: min(88vw, 27rem);
+  width: min(calc(100vw - 2rem), 27rem);
   max-height: min(70vh, 30rem);
   overflow-y: auto;
   display: grid;
@@ -984,18 +1845,30 @@ details.release[open] > summary {
   gap: 0.6rem;
   padding: 0.75rem;
   border: 1px solid var(--edge);
-  border-radius: 10px;
-  /* Opaque enough to read over raw scene, since the panel hangs off the bar and onto the page. */
+  border-radius: 12px;
   background: rgba(9, 9, 11, 0.92);
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(6px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .picker[open] > .picker-panel {
+    animation: drop 0.22s var(--ease);
+  }
+}
+
+@keyframes drop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
 }
 
 .tile {
   width: 100%;
   padding: 2px;
   border: 2px solid var(--edge);
-  border-radius: 8px;
+  border-radius: 9px;
   background: var(--zinc-950);
   color: var(--muted);
   font: inherit;
@@ -1009,7 +1882,7 @@ details.release[open] > summary {
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 5px;
+  border-radius: 6px;
 }
 
 .tile span {
@@ -1032,17 +1905,14 @@ details.release[open] > summary {
 
 /*
  * The language dropdown is the scene picker's sibling: the same button and the same panel, holding a
- * list of links rather than a grid of thumbnails. It is navigation, so nothing about it is scripted;
- * the disclosure opens on its own and every language is an ordinary underlined link. The language
- * you are reading is not a link at all, which is what aria-current says and the fill repeats.
+ * list of links rather than a grid of thumbnails. The language you are reading is not a link at
+ * all, which is what aria-current says and the fill repeats.
  */
 .lang > .picker-panel {
-  display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0.15rem;
   width: max-content;
   min-width: 9rem;
-  max-width: 88vw;
   padding: 0.4rem;
 }
 
@@ -1069,21 +1939,61 @@ details.release[open] > summary {
 
 .footer {
   width: 100%;
-  max-width: 78rem;
-  margin: 0 auto 2rem;
-  padding: 1.5rem clamp(1rem, 4vw, 2rem);
+  margin-top: 1rem;
+  padding: 2rem clamp(1rem, 4vw, 2.5rem) 2.5rem;
+  border-top: 1px solid var(--edge);
+  background: rgba(9, 9, 11, 0.9);
   color: var(--muted);
   font-size: 0.9rem;
 }
 
-/* The footer keeps the words beside the marks, and the word carries the underline. */
+.footer-inner {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 76rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 52rem) {
+  .footer-inner {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 3rem;
+  }
+
+  .footer-inner > p {
+    grid-column: 2;
+  }
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  grid-row: span 3;
+}
+
+.footer-brand img {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.footer-brand strong {
+  display: block;
+  color: var(--bright);
+  font-size: 1.05rem;
+}
+
+.footer-brand span {
+  font-size: 0.85rem;
+}
+
 .footer nav {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 1.5rem;
-  margin-bottom: 1rem;
 }
 
+/* The footer keeps the words beside the marks, and the word carries the underline. */
 .icon-row a {
   display: inline-flex;
   align-items: center;
@@ -1101,14 +2011,18 @@ details.release[open] > summary {
 }
 
 .footer p {
-  margin: 0 0 0.5rem;
-}
-
-.footer p:last-child {
-  margin-bottom: 0;
+  margin: 0;
 }
 
 /* ----------------------------------------------------------------- narrow */
+
+@media (max-width: 72rem) {
+  .hero-visual {
+    max-width: 44rem;
+    width: 100%;
+    justify-self: center;
+  }
+}
 
 @media (max-width: 60rem) {
   .layout {
@@ -1132,49 +2046,24 @@ details.release[open] > summary {
     overflow-y: auto;
     margin-top: 0.75rem;
   }
+
+  .hero-visual {
+    padding: 0.5rem 0.25rem 2rem;
+  }
+
+  .window {
+    transform: none;
+  }
 }
 
 /* ------------------------------------------------------------------- wide */
 
-/*
- * Past 1600px the type, the panel and the picker's thumbnails take the room that comes with the
- * wider screen; the column stays centred. Nothing here changes a colour or an opacity, so every
- * ratio in the header still holds; the tiles only grow, keeping the same 2px borders.
- */
 @media (min-width: 100rem) {
-  .layout,
-  .footer {
-    margin-left: auto;
-    margin-right: auto;
+  .layout-wide,
+  .footer-inner {
+    max-width: 84rem;
   }
 
-  .layout-wide {
-    max-width: 80rem;
-  }
-
-  .hero {
-    padding-top: 4.5rem;
-  }
-
-  .hero-column {
-    padding: 0 4rem 3rem;
-  }
-
-  .brand img {
-    width: 2rem;
-  }
-
-  .hero h1 {
-    /* One full line across the 80rem panel; sized to fit, not to wrap. */
-    font-size: 2.95rem;
-    white-space: nowrap;
-  }
-
-  .lead {
-    font-size: 1.12rem;
-  }
-
-  /* Four across puts the eleven scenes in three rows, so the panel never has to scroll. */
   .picker-panel {
     width: 34rem;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1182,8 +2071,22 @@ details.release[open] > summary {
   }
 }
 
+/* ------------------------------------------------------------------ motion */
+
 @media (prefers-reduced-motion: reduce) {
-  * {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
     transition: none !important;
+  }
+
+  .embers,
+  .link-line::after {
+    display: none;
+  }
+
+  .window {
+    transform: none;
   }
 }

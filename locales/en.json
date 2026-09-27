@@ -10,10 +10,17 @@
   "docsLink": "Docs",
   "scene": "Background",
   "changeLanguage": "Change language",
+  "navLabel": "Sections",
+  "navAbout": "About",
+  "navFeatures": "Features",
+  "navInstall": "Install",
+  "navReleases": "Releases",
+  "navHelp": "Help",
 
   "kicker": "A launcher for Vintage Story",
   "headline": "Every version of Vintage Story, side by side.",
   "lead": "Keep as many installations as you like, each with its own mods, worlds and configs, make manual and automatic backups before anything breaks, and browse the ModDB without leaving the launcher.",
+  "heroChips": ["Free and open source (MIT)", "Windows and Linux", "14 languages"],
 
   "download": "Download",
   "downloadFor": "Download for ",
@@ -21,51 +28,76 @@
   "linux": "Linux",
   "docs": "Browse the documentation",
   "seeFeatures": "See what it does",
+  "releaseLine": "{tag}, released {date}.",
+  "otherFiles": "Other systems and files",
   "docsNote": "",
   "beta": "Beta prerelease, so expect rough edges. Back up your worlds first.",
 
-  "platforms": [
-    ["Windows", "riftlauncher-X.X.X-setup.exe"],
-    ["Linux AppImage", "riftlauncher-X.X.X.AppImage"],
-    ["Debian and Ubuntu", ".deb"],
-    ["Fedora and RHEL", ".rpm"],
-    ["Arch", ".pacman"]
+  "aboutEyebrow": "About",
+  "aboutTitle": "The continuation of VS Launcher",
+  "lineage": ["by XurxoMF, archived", "by Stratum, maintained"],
+  "about": [
+    "RiftLauncher is built on {vsLauncher:VS Launcher} by {xurxo:XurxoMF}, and carries it on now that the original is archived.",
+    "Made by the {stratum:Stratum} team, with its core rebuilt and tested on Windows and Linux.",
+    "Thanks to XurxoMF and everyone who coded, translated and tested the original. The {contributors:contributors page} names them."
   ],
 
-  "features": "What it does",
+  "motionEyebrow": "In motion",
+  "motionTitle": "See it at work",
+  "motionIntro": "Recorded on 1.7.0-beta.11 on Linux, with made-up installations and mods. The ModDB results are the live ones.",
+  "clips": [
+    [
+      "Mods browser",
+      "The ModDB, inside the launcher",
+      "Search the ModDB with filters, Author included, and install from the card: its colour shows how well a release fits.",
+      "Tick several mods to install them together, and turn on suggestions of compatible mods if you want them, each with its reason.",
+      "Typing an author in the Mods page filter and scrolling that author's ModDB mods"
+    ],
+    [
+      "Manage Mods",
+      "Act on a whole selection",
+      "Enable, disable or update every ticked mod at once, search what is already installed, and hold one mod back so Update all skips it.",
+      "Profiles, a details panel, and the mods a server sent, grouped under that server.",
+      "Three installed mods ticked, and the actions for the selection appearing above the list"
+    ],
+    [
+      "Installation check",
+      "What will stop the game loading",
+      "Manage Mods lists what would keep the game from loading, like a missing dependency or the same mod installed twice.",
+      "Fix it from the same place: install the missing mod, or delete the extra copy.",
+      "The installation check folding open on a missing dependency and a mod installed twice"
+    ],
+    [
+      "Game sessions",
+      "After the game, the numbers",
+      "When the game closes, read a report built from its logs, with errors and warnings grouped under the mod they name. Copy report hides paths and account details.",
+      "Memory and CPU for your recent sessions, after the fact. A crash notification opens the report.",
+      "Opening a recorded play session to see its memory and CPU curve"
+    ],
+    [
+      "Look and languages",
+      "Make it yours",
+      "Eight accent colours, and a background from the catalog of scenes or an image of your own. The scene behind this page is one of them.",
+      "14 languages, Belarusian the newest, translated on {weblate:Weblate}.",
+      "Switching the background to Lava Springs, then going through the accent colours"
+    ]
+  ],
+
+  "featuresEyebrow": "Features",
+  "features": "Everything else in one launcher",
+  "featuresIntro": "A line or two per area. The documentation goes further.",
   "cards": [
-    ["versions", "Versions side by side", "Install as many game versions as you like, and choose which one each installation runs."],
-    [
-      "installations",
-      "Installations that stay separate",
-      "Every installation keeps its own mods, worlds and configs, so what you do in one leaves the others alone."
-    ],
-    ["backup", "Backups", "Make a backup by hand whenever you want, or have the launcher take one automatically before you play."],
-    [
-      "moddb",
-      "Mods without leaving the launcher",
-      "Browse the ModDB, install and update, search what is already installed, hold a mod back so Update all skips it, and get suggestions for an installation if you turn them on."
-    ],
-    [
-      "health",
-      "A check before you play",
-      "Manage Mods lists what will stop the game loading, such as a missing dependency, and flags a mod installed twice, each with the action that fixes it."
-    ],
-    [
-      "servers",
-      "Servers, one click away",
-      "Save a server's address on an installation, then join it from the launcher. A modpack can carry the bookmark to whoever you share it with."
-    ],
-    [
-      "sessions",
-      "After each session",
-      "When the game closes, read a report built from its logs, with errors and warnings grouped under the mod they name, and look back at memory and CPU over your recent sessions."
-    ],
-    ["accounts", "Your accounts", "Keep several Vintage Story accounts saved and switch between them."],
-    ["scene", "Make it yours", "Set the launcher's background from the catalog of scenes, or from an image of your own."]
+    ["versions", "Versions side by side", "Install any official version in one click, or register a game folder you already have. Two builds of the same version each get a name you can change later."],
+    ["installations", "Installations that stay separate", "Each installation picks its version and keeps its own mods, worlds, settings and environment variables, so what you do in one leaves the others alone."],
+    ["backup", "Backups", "Make a backup by hand whenever you want, or have the launcher take one before every play, with a limit you set."],
+    ["modpack", "Modpacks", "Export an installation's mods as a .json file, and import one to install them all at once."],
+    ["servers", "Servers, one click away", "Save a server's address on an installation, and Join starts the game already pointed at it. A modpack can carry the bookmark to whoever you share it with."],
+    ["accounts", "Your accounts", "Keep several Vintage Story accounts saved and switch between them. No system keyring? You can still log in, and login works behind a proxy."]
   ],
 
-  "screenshots": "What it looks like",
+  "shotsEyebrow": "Screenshots",
+  "screenshots": "A closer look",
+  "shotsIntro": "Taken on 1.7.0-beta.11, on Linux.",
   "shots": [
     ["The launcher's home page, with one installation picked and ready to play", "Home, with the installation you played last."],
     [
@@ -94,7 +126,44 @@
     ["The home page again, with the teal accent colour applied", "Amber by default, teal here, six more to pick from."]
   ],
 
+  "trustEyebrow": "Privacy and trust",
+  "trustTitle": "Built in the open",
+  "trust": [
+    ["privacy", "No telemetry", "The {privacy:privacy policy} lists every request the launcher can make, and ships inside it under Info & Help.", "Shared logs and reports hide your folder paths and account details."],
+    ["health", "Counted only with your yes", "The launcher can count your install on its ModDB page, and it asks first.", "It asks once per version, and you can answer for good either way."],
+    ["checked", "Checked releases", "Every installer is built by a public CI run from a tagged commit.", "Each release lists SHA-256 checksums and VirusTotal results."],
+    ["review", "Reviewed in public", "Every change goes through a reviewed {prs:pull request} and thousands of automated tests.", "Bugs are tracked in the open on the {issues:issue tracker}."]
+  ],
+
+  "installEyebrow": "Install",
+  "installTitle": "Getting started",
+  "installIntro": "The files below come from the newest release, and every older one is on the {releases:GitHub releases page}. RiftLauncher is a launcher, not a mod: never put it in your Mods folder.",
+  "installWindows": "Run the setup .exe. It is not code-signed yet, so SmartScreen may warn: the checksums and scans are on the release. Vintage Story needs .NET 7, 8 or 10 depending on the version.",
+  "installLinux": "The AppImage runs on any distribution, and the .deb, .rpm and .pacman packages install like any other app. The built-in updater handles every one of them.",
+  "installMac": "No build yet. Follow the {releases:releases} to know when that changes.",
+  "guideWindows": "Windows guide",
+  "guideLinux": "Linux guide",
+  "guideMac": "About macOS",
+  "fileLabels": {
+    "windows": "Windows installer",
+    "appimage": "AppImage, any distribution",
+    "deb": "Debian and Ubuntu",
+    "rpm": "Fedora and RHEL",
+    "pacman": "Arch"
+  },
+  "installNotes": [
+    [
+      "Coming from VS Launcher",
+      "On first run, RiftLauncher copies your VS Launcher settings into its own folder, so your installations show up right away. Your account usually comes across too; if not, you log in once. Nothing on the VS Launcher side is moved or removed."
+    ],
+    [
+      "Staying up to date",
+      "The launcher checks for its own updates and asks before downloading one. Betas are opt-in under Config, Beta versions, and What's new shows after an update."
+    ]
+  ],
+
   "releases": "Releases",
+  "releasesTitle": "What changed lately",
   "prerelease": "beta",
   "allReleases": "All releases on GitHub",
   "downloads": "Downloads per release",
@@ -103,6 +172,16 @@
   "downloadsLabel": "Downloads per release. {rows}.",
   "overTime": "Downloads over time",
   "overTimeNote": "{firstTotal} on {firstDate} to {lastTotal} on {lastDate}, counted once a day.",
+
+  "helpEyebrow": "Help",
+  "helpTitle": "Questions, bugs, translations",
+  "help": [
+    ["discord", "Ask for help", "On the {discord:Stratum Discord}."],
+    ["github", "Report a bug", "On {issues:GitHub issues}, with your version and your system."],
+    ["docs", "Read the guides", "Install and usage guides in the {docs:documentation}."],
+    ["globe", "Translate", "Help on {weblate:Weblate} with a GitHub account."]
+  ],
+  "support": "Support Zaldaryon on {kofi:Ko-fi}, or the Stratum team on {opencollective:Open Collective}.",
 
   "privacy": "Privacy Policy",
   "unofficial": "RiftLauncher is unofficial and not affiliated with Anego Studios, the developers of {vintageStory}.",
