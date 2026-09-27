@@ -306,6 +306,7 @@ const iconLink = (href, icon, label) => `<a href="${escape(href)}">${icon}<span>
  * header, so the page uses a 320px copy kept in assets/ and the full file is only the og:image.
  */
 const EMBLEM = "emblem.webp"
+const VSL_LOGO = "vsl-logo.webp"
 
 function footer(out, t) {
   const link = (href, text) => `<a href="${href}">${text}</a>`
@@ -852,7 +853,7 @@ function landing(t) {
     ["about", t.navAbout, (n) => `<section id="about" class="panel section reveal" aria-labelledby="about-heading">
 ${sectionHead(n, "about", t.aboutEyebrow, t.aboutTitle)}
 <div class="story">
-<div class="lineage" aria-hidden="true"><div class="node"><span class="node-mark">VS</span><span><strong>VS Launcher</strong>${escape(t.lineage[0])}</span></div><div class="link-line"></div><div class="node"><img src="${at(EMBLEM)}" alt="" width="320" height="320" loading="lazy"><span><strong>RiftLauncher</strong>${escape(t.lineage[1])}</span></div></div>
+<div class="lineage"><div class="node"><img src="${at(VSL_LOGO)}" alt="VS Launcher logo" width="112" height="112" loading="lazy"><span><strong>VS Launcher</strong>${escape(t.lineage[0])}</span></div><div class="link-line"></div><div class="node"><img src="${at(EMBLEM)}" alt="" width="320" height="320" loading="lazy"><span><strong>RiftLauncher</strong>${escape(t.lineage[1])}</span></div></div>
 <div>${t.about.map((text) => `<p>${rich(text, urls)}</p>`).join("")}</div>
 </div>
 </section>`],
