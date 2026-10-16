@@ -31,7 +31,7 @@
   "releaseLine": "{tag}, released {date}.",
   "otherFiles": "Other systems and files",
   "docsNote": "",
-  "beta": "Beta prerelease, so expect rough edges. Back up your worlds first.",
+  "beta": "Release candidate for 1.7.0, the first stable release. Back up your worlds first.",
 
   "aboutEyebrow": "About",
   "aboutTitle": "The continuation of VS Launcher",
@@ -89,8 +89,8 @@
   "cards": [
     ["versions", "Versions side by side", "Install any official version in one click, or register a game folder you already have. Two builds of the same version each get a name you can change later."],
     ["installations", "Installations that stay separate", "Each installation picks its version and keeps its own mods, worlds, settings and environment variables, so what you do in one leaves the others alone."],
-    ["backup", "Backups", "Make a backup by hand whenever you want, or have the launcher take one before every play, with a limit you set."],
-    ["modpack", "Modpacks", "Export an installation's mods as a .json file, and import one to install them all at once."],
+    ["backup", "Backups, and worlds one by one", "Back up an installation by hand or before every play, with a limit you set. Manage Worlds backs up, restores, copies or moves a single world."],
+    ["modpack", "Modpacks", "Export an installation's mods as a .json file, with its servers and the mod configs you pick if you want them, and import one to install them all at once."],
     ["servers", "Servers, one click away", "Save a server's address on an installation, and Join starts the game already pointed at it. A modpack can carry the bookmark to whoever you share it with."],
     ["accounts", "Your accounts", "Keep several Vintage Story accounts saved and switch between them. No system keyring? You can still log in, and login works behind a proxy."]
   ],
@@ -159,6 +159,10 @@
     [
       "Staying up to date",
       "The launcher checks for its own updates and asks before downloading one. Betas are opt-in under Config, Beta versions, and What's new shows after an update."
+    ],
+    [
+      "Keeping it on one drive",
+      "Put an empty file named RiftLauncher.portable beside the AppImage, or beside the install folder on Windows, and the launcher keeps its settings in a RiftLauncherData folder there instead of your user folder."
     ]
   ],
 

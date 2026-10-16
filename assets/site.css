@@ -2090,3 +2090,10 @@ details.release[open] > summary {
     transform: none;
   }
 }
+
+/* An odd note out takes the whole row instead of leaving half of it empty. */
+@media (min-width: 48rem) {
+  .note:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
