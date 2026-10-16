@@ -31,7 +31,7 @@
   "releaseLine": "{tag}, publiée le {date}.",
   "otherFiles": "Autres systèmes et fichiers",
   "docsNote": "La documentation est en anglais.",
-  "beta": "Préversion bêta : attendez-vous à des aspérités. Sauvegardez vos mondes d'abord.",
+  "beta": "Version candidate de la 1.7.0, la première version stable. Sauvegardez vos mondes d'abord.",
 
   "aboutEyebrow": "Le projet",
   "aboutTitle": "La suite de VS Launcher",
@@ -89,8 +89,8 @@
   "cards": [
     ["versions", "Les versions côte à côte", "Installez n'importe quelle version officielle en un clic, ou enregistrez un dossier du jeu que vous avez déjà. Deux builds de la même version ont chacune un nom, modifiable ensuite."],
     ["installations", "Des installations bien séparées", "Chaque installation choisit sa version et garde ses propres mods, mondes, réglages et variables d'environnement : ce que vous faites dans l'une ne touche pas aux autres."],
-    ["backup", "Les sauvegardes", "Faites une sauvegarde à la main quand vous voulez, ou laissez le launcher en prendre une avant chaque partie, avec une limite que vous fixez."],
-    ["modpack", "Les modpacks", "Exportez les mods d'une installation dans un fichier .json, et importez-en un pour tous les installer d'un coup."],
+    ["backup", "Sauvegardes, et mondes un par un", "Sauvegardez une installation à la main ou avant chaque partie, avec une limite que vous fixez. « Gérer les mondes » sauvegarde, restaure, copie ou déplace un seul monde."],
+    ["modpack", "Les modpacks", "Exportez les mods d'une installation dans un fichier .json, avec ses serveurs et les configs de mods que vous choisissez si vous le voulez, et importez-en un pour tous les installer d'un coup."],
     ["servers", "Vos serveurs à un clic", "Enregistrez l'adresse d'un serveur sur une installation, et « Rejoindre » lance le jeu déjà tourné vers lui. Un modpack peut emporter ce favori chez ceux avec qui vous le partagez."],
     ["accounts", "Vos comptes", "Gardez plusieurs comptes Vintage Story enregistrés et passez de l'un à l'autre. Pas de trousseau système ? La connexion marche quand même, et aussi derrière un proxy."]
   ],
@@ -159,6 +159,10 @@
     [
       "Rester à jour",
       "Le launcher vérifie ses propres mises à jour et demande avant d'en télécharger une. Les bêtas s'activent dans Configuration, Versions bêta, et les nouveautés s'affichent après une mise à jour."
+    ],
+    [
+      "Tout garder sur un même disque",
+      "Posez un fichier vide nommé RiftLauncher.portable à côté de l'AppImage, ou à côté du dossier d'installation sous Windows, et le launcher range ses réglages dans un dossier RiftLauncherData à cet endroit au lieu de votre dossier utilisateur."
     ]
   ],
 
